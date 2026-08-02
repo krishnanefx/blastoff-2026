@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "blastoff",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/private/tmp/claude-501/-Users-krishnanadaikkappan-Downloads-UKSSC-BLASTOFF-2026/fc6aa237-eebf-499f-bd2f-6b652b357556/scratchpad/server.js"
+      ],
+      "port": 4321,
+      "autoPort": true
+    }
+  ]
+}
