@@ -24,12 +24,12 @@
   const CONFIG = {
     ticketsUrl: 'https://www.eventbrite.sg/e/blastoff-2026-to-new-horizons-tickets-1995329425023',
 
-    // Paths below are URL-encoded and relative, so the local preview works as
-    // shipped. In Wix, upload each asset to Media and override via the matching
-    // attribute on the Custom Element. Blank falls back to live text.
-    heroImage: './Asset%206ukssc%20blastoff%201%201.png',                    // 1368x300
-    taglineImage: './to%20new%20heights_%20bigger,%20better,%20bolder!.svg', // 345x20
-    crestImage: './assets/ukssc-crest.png',                                  // 91x84
+    // Relative paths work as-is on any static host. On Wix, upload each asset
+    // to Media and override via the matching attribute on the Custom Element.
+    // Blank — or a URL that 404s — falls back to live text.
+    heroImage: './assets/blastoff-wordmark.png',  // 1368x300
+    taglineImage: './assets/tagline.svg',         // 345x20
+    crestImage: './assets/ukssc-crest.png',       // 91x84
 
     // Where sponsor logos are looked up: <logoBase><slug>.png
     logoBase: './assets/logos/',
@@ -483,7 +483,7 @@
   }
   /* Gold reads through size and isolation first, the badge second. 78px was
      only a 40% step over 56px and got lost next to wide lockups. max-width
-     rises with the height or `contain` would letterbox a horizontal lockup
+     rises with the height or object-fit would letterbox a horizontal lockup
      back down below 100px tall and undo the bump. */
   .logo-item.is-gold img,
   .logo-item.is-gold .name { height: 100px; max-width: 320px; }
