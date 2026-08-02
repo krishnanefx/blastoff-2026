@@ -199,6 +199,142 @@
     img.style.width = (h * r).toFixed(1) + 'px';
   }
 
+  // Sponsor rows drift at a fixed px/sec rather than a fixed duration, so a row
+  // with 13 logos moves at the same rate as one with 9.
+  const MARQUEE_SPEED = 44;
+
+  /* One engine behind every horizontal carousel here.
+   *
+   * The track holds exactly two copies of its content, so wrapping the offset
+   * modulo one copy's width is seamless in both directions — there is no start
+   * or end to run into, and a drag can keep going either way forever.
+   *
+   * Everything is driven from a single `offset`: autoplay adds to it, a drag
+   * sets it, a flick decays into it, the buttons ease it. That is why this
+   * replaced the CSS keyframe — a keyframe cannot be grabbed.
+   */
+  function loopTrack(viewport, track, { autoplay = 0 } = {}) {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const drift = reduced ? 0 : autoplay;
+
+    let half = 0, offset = 0, vel = 0;
+    let dragging = false, hovering = false, focused = false;
+    let lastX = 0, lastT = 0, moved = 0;
+    let glide = null;                  // { from, to, t } while a button eases
+    let raf = 0, prev = 0;
+
+    const measure = () => {
+      const set = track.firstElementChild;
+      half = set ? set.getBoundingClientRect().width : 0;
+    };
+    const wrap = (o) => (half > 0 ? ((o % half) + half) % half : 0);
+    const paint = () => {
+      track.style.transform = `translate3d(${-wrap(offset)}px,0,0)`;
+    };
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    const frame = (now) => {
+      const dt = Math.min(0.064, (now - (prev || now)) / 1000);
+      prev = now;
+      if (glide) {
+        glide.t += dt;
+        const k = Math.min(1, glide.t / 0.42);
+        offset = glide.from + (glide.to - glide.from) * ease(k);
+        if (k === 1) glide = null;
+      } else if (!dragging) {
+        if (Math.abs(vel) > 2) {
+          offset += vel * dt;
+          vel *= Math.pow(0.02, dt);   // a flick keeps ~2% of its speed per second
+        } else {
+          vel = 0;
+          if (drift && !hovering && !focused) offset += drift * dt;
+        }
+      }
+      paint();
+      raf = requestAnimationFrame(frame);
+    };
+
+    /* ---- drag ---- */
+    viewport.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      dragging = true; glide = null; vel = 0; moved = 0;
+      lastX = e.clientX; lastT = e.timeStamp;
+      viewport.classList.add('is-dragging');
+      // Capture can reject an id the browser has already let go of.
+      try { viewport.setPointerCapture(e.pointerId); } catch { /* not fatal */ }
+    });
+    viewport.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX;
+      const dt = Math.max(8, e.timeStamp - lastT) / 1000;
+      lastX = e.clientX; lastT = e.timeStamp;
+      moved += Math.abs(dx);
+      offset -= dx;
+      // Smoothed, so one stuttery frame at release can't fling the row.
+      vel = 0.8 * (-dx / dt) + 0.2 * vel;
+    });
+    const release = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      viewport.classList.remove('is-dragging');
+      if (viewport.hasPointerCapture?.(e.pointerId)) {
+        viewport.releasePointerCapture(e.pointerId);
+      }
+      if (Math.abs(vel) < 40) vel = 0;            // a slow let-go should just stop
+      vel = Math.max(-4000, Math.min(4000, vel));
+    };
+    viewport.addEventListener('pointerup', release);
+    viewport.addEventListener('pointercancel', release);
+    // A drag that happens to end on a child is not a click on that child.
+    viewport.addEventListener('click', (e) => {
+      if (moved > 6) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+
+    /* ---- trackpad, and shift+wheel for a mouse ---- */
+    viewport.addEventListener('wheel', (e) => {
+      // Only take horizontal intent. A plain vertical wheel belongs to the page;
+      // swallowing it is what makes a carousel feel like a trap.
+      const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX
+               : (e.shiftKey ? e.deltaY : 0);
+      if (!dx) return;
+      e.preventDefault();
+      glide = null; vel = 0;
+      offset += dx * (e.deltaMode === 1 ? 16 : 1);
+    }, { passive: false });
+
+    /* ---- keyboard ---- */
+    viewport.addEventListener('keydown', (e) => {
+      const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!dir) return;
+      e.preventDefault();
+      api.step(dir);
+    });
+
+    /* ---- hold the drift while someone is actually reading the row ---- */
+    viewport.addEventListener('pointerenter', () => { hovering = true; });
+    viewport.addEventListener('pointerleave', () => { hovering = false; });
+    viewport.addEventListener('focusin', () => { focused = true; });
+    viewport.addEventListener('focusout', () => { focused = false; });
+
+    // Images and webfonts land after first paint and change the track width, so
+    // the wrap point has to be re-measured rather than read once.
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+
+    measure();
+    paint();
+    raf = requestAnimationFrame(frame);
+
+    const api = {
+      step(dir, dist) {
+        glide = { from: offset, to: offset + dir * (dist || viewport.clientWidth * 0.8), t: 0 };
+        vel = 0;
+      },
+      stop() { cancelAnimationFrame(raf); ro.disconnect(); },
+    };
+    return api;
+  }
+
   const CHEVRON = `
     <svg class="chev" viewBox="0 0 36 17.67" aria-hidden="true" focusable="false">
       <path d="M1.7 1.7 18 15.97 34.3 1.7" fill="none" stroke="currentColor"
@@ -402,7 +538,7 @@
 
   .carousel { margin-top: clamp(40px, 7vw, 86px); }
   /* Transform track rather than a native scroller, so the rail can wrap past
-     its own end instead of stopping. `pan-y` keeps vertical page scrolling with
+     its own end instead of stopping. touch-action: pan-y keeps vertical scroll with
      the browser and claims only the horizontal axis for the drag. */
   .rail {
     overflow: hidden;
@@ -621,7 +757,6 @@
     font-size: 10px; line-height: 1.3; letter-spacing: -0.02em;
   }
 
-  @keyframes marquee-scroll { to { transform: translateX(-50%); } }
 
   /* ---- responsive ---- */
   @media (max-width: 900px) {
@@ -652,11 +787,9 @@
       transition-duration: .001ms !important;
       scroll-behavior: auto !important;
     }
-    /* Auto-scroll off: make the row a manual scroller and drop the clone,
-       otherwise every logo would appear twice in a static list. */
-    .marquee { overflow-x: auto; scrollbar-width: none; }
-    .marquee::-webkit-scrollbar { display: none; }
-    .marquee-set[aria-hidden="true"] { display: none; }
+    /* The drift stops (loopTrack reads the same query), but drag, wheel and
+       arrow keys still work, so the clone stays — it is what makes the row
+       continuous in both directions rather than a list with two ends. */
   }
   `;
 
@@ -705,12 +838,15 @@
 
   // Track = exactly two copies, so the -50% keyframe loops seamlessly. The
   // clone is aria-hidden so screen readers announce each sponsor once.
+  // tabindex so the row is reachable by keyboard, which is also what makes the
+  // arrow keys land somewhere. Speed is px/sec rather than a duration, so both
+  // rows drift at the same rate regardless of how many sponsors they hold.
   function marqueeRow(group, cfg, dir) {
     const set = group.items.map((i) => logoItem(i, cfg)).join('');
-    const dur = Math.max(30, Math.round(group.items.length * 4.5));
     return `
       <div class="wrap"><h3 class="group-label">${esc(group.group)}</h3></div>
-      <div class="marquee" data-dir="${dir}" style="--dur:${dur}s">
+      <div class="marquee" data-dir="${dir}" tabindex="0" role="group"
+           aria-label="${esc(group.group)} sponsors, draggable">
         <div class="marquee-track">
           <div class="marquee-set">${set}</div>
           <div class="marquee-set" aria-hidden="true">${set}</div>
@@ -795,7 +931,13 @@
               stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div></div>
-        <div class="rail bleed" tabindex="0">${plates}</div>
+        <div class="rail bleed" tabindex="0" role="group"
+             aria-label="Photos, draggable">
+          <div class="rail-track">
+            <div class="rail-set">${plates}</div>
+            <div class="rail-set" aria-hidden="true">${plates}</div>
+          </div>
+        </div>
       </section>
 
       <div class="wrap">
@@ -871,14 +1013,17 @@
         logoBase: this.getAttribute('logo-base') || CONFIG.logoBase,
       };
 
-      const root = this.attachShadow({ mode: 'open' });
+      // attachShadow throws if one is already attached, which it is on re-render.
+      const root = this.shadowRoot || this.attachShadow({ mode: 'open' });
       const style = document.createElement('style');
       style.textContent = CSS;
-      root.append(style);
+      root.replaceChildren(style);
       root.append(document.createRange().createContextualFragment(template(cfg)));
 
+      this._loops = [];
       this._wireNav(root);
       this._wireCarousel(root);
+      this._wireMarquees(root);
       this._wireFaqs(root);
       this._wireLogos(root);
       this._wireArtwork(root);
@@ -887,8 +1032,13 @@
     attributeChangedCallback() {
       if (!this._mounted) return;
       this._mounted = false;
-      this.shadowRoot.replaceChildren();
+      this._stopLoops();          // else the old rAF keeps painting a dead track
       this.connectedCallback();
+    }
+
+    disconnectedCallback() {
+      this._stopLoops();
+      this._mounted = false;
     }
 
     _wireNav(root) {
@@ -918,53 +1068,40 @@
 
     _wireCarousel(root) {
       const rail = root.querySelector('.rail');
-      const buttons = root.querySelectorAll('.rail-btn');
+      const track = root.querySelector('.rail-track');
+      if (!rail || !track) return;
 
+      const loop = loopTrack(rail, track);
+      this._loops.push(loop);
+
+      // One plate plus the trailing margin that carries the gap.
       const step = () => {
-        const first = rail.querySelector('.plate');
-        return first ? first.getBoundingClientRect().width + 20 : rail.clientWidth * 0.8;
+        const plate = track.querySelector('.plate');
+        if (!plate) return rail.clientWidth * 0.8;
+        const gap = parseFloat(getComputedStyle(plate).marginInlineEnd) || 0;
+        return plate.getBoundingClientRect().width + gap;
       };
 
-      const sync = () => {
-        const max = rail.scrollWidth - rail.clientWidth - 1;
-        buttons.forEach((b) => {
-          b.disabled = Number(b.dataset.dir) < 0 ? rail.scrollLeft <= 0 : rail.scrollLeft >= max;
-        });
-      };
-
-      buttons.forEach((b) => b.addEventListener('click', () => {
-        rail.scrollBy({ left: Number(b.dataset.dir) * step(), behavior: 'smooth' });
-      }));
-
-      rail.addEventListener('scroll', sync, { passive: true });
-      new ResizeObserver(sync).observe(rail);
-      sync();
-
-      // Pointer drag, so the rail feels the same on desktop as on touch.
-      let down = false, startX = 0, startScroll = 0, moved = 0;
-      rail.addEventListener('pointerdown', (e) => {
-        if (e.pointerType === 'touch') return;   // native momentum is better
-        down = true; moved = 0;
-        startX = e.clientX; startScroll = rail.scrollLeft;
-        rail.classList.add('is-dragging');
-        rail.setPointerCapture(e.pointerId);
+      // The rail wraps now, so there is no end to arrive at and nothing to
+      // disable — the arrows just nudge the same offset the drag moves.
+      root.querySelectorAll('.rail-btn').forEach((b) => {
+        b.disabled = false;
+        b.addEventListener('click', () => loop.step(Number(b.dataset.dir), step()));
       });
-      rail.addEventListener('pointermove', (e) => {
-        if (!down) return;
-        const dx = e.clientX - startX;
-        moved = Math.max(moved, Math.abs(dx));
-        rail.scrollLeft = startScroll - dx;
+    }
+
+    _wireMarquees(root) {
+      root.querySelectorAll('.marquee').forEach((row) => {
+        const track = row.querySelector('.marquee-track');
+        if (!track) return;
+        const dir = Number(row.dataset.dir) || 1;
+        this._loops.push(loopTrack(row, track, { autoplay: MARQUEE_SPEED * dir }));
       });
-      const end = (e) => {
-        if (!down) return;
-        down = false;
-        rail.classList.remove('is-dragging');
-        if (rail.hasPointerCapture?.(e.pointerId)) rail.releasePointerCapture(e.pointerId);
-        sync();
-      };
-      rail.addEventListener('pointerup', end);
-      rail.addEventListener('pointercancel', end);
-      rail.addEventListener('click', (e) => { if (moved > 6) e.preventDefault(); }, true);
+    }
+
+    _stopLoops() {
+      (this._loops || []).forEach((l) => l.stop());
+      this._loops = [];
     }
 
     // A bad Media Manager URL should degrade to text, not a broken-image icon.
