@@ -34,7 +34,7 @@
   <link rel="icon" href="./assets/ukssc-crest.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" href="./assets/fonts/open-sauce-sans-700.woff2" as="font" type="font/woff2" crossorigin>
 
   <style>
     html, body { margin: 0; padding: 0; background: #141414; }
@@ -44,6 +44,8 @@
 </head>
 <body>
   <ukssc-blastoff></ukssc-blastoff>
-  <script src="./blastoff-element.js"></script>
+  <!-- Bump ?v= on every deploy. GitHub Pages caches assets, so without this a
+       visitor who loaded a bad build keeps it until their cache expires. -->
+  <script src="./blastoff-element.js?v=4"></script>
 </body>
 </html>

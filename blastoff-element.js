@@ -1,16 +1,18 @@
 /* =============================================================================
  * <ukssc-blastoff> — UKSSC Blastoff! 2026 landing section
  * -----------------------------------------------------------------------------
- * A single self-contained Web Component. Drop this file into Wix Dev Mode as a
- * Custom Element (Add > Embed & Social > Custom Element), tag name:
+ * A single self-contained Web Component, served as a static site from GitHub
+ * Pages. Everything — markup, styles, fonts, behaviour — lives in a shadow
+ * root, so nothing on the host page can leak in and this can't leak out.
  *
- *     ukssc-blastoff
+ *     <ukssc-blastoff></ukssc-blastoff>
+ *     <script src="./blastoff-element.js?v=4"></script>
  *
- * Everything (markup, styles, behaviour) lives in a shadow root, so Wix's own
- * stylesheet can't leak in and this can't leak out.
- *
- * Configure from the Wix Editor via attributes, or edit CONFIG below:
+ * Edit CONFIG below, or override per-instance with attributes:
  *     <ukssc-blastoff tickets-url="https://..." hero-image="https://...">
+ *
+ * Asset paths resolve against this script's own URL, so the whole folder can
+ * be moved or served from a subpath without touching anything.
  * ========================================================================== */
 
 (() => {
@@ -24,9 +26,8 @@
   const CONFIG = {
     ticketsUrl: 'https://www.eventbrite.sg/e/blastoff-2026-to-new-horizons-tickets-1995329425023',
 
-    // Relative paths work as-is on any static host. On Wix, upload each asset
-    // to Media and override via the matching attribute on the Custom Element.
-    // Blank — or a URL that 404s — falls back to live text.
+    // Relative to this script, so they work at any served subpath. Blank — or
+    // a URL that 404s — falls back to live text rather than a broken image.
     heroImage: './assets/blastoff-wordmark.png',  // 1368x300
     taglineImage: './assets/tagline.svg',         // 345x20
     crestImage: './assets/ukssc-crest.png',       // 91x84
@@ -86,7 +87,7 @@
   // assets/logos/ and it appears — no code change. If the file is missing (or
   // fails to load) the card falls back to the typeset name, so the grid is never
   // blank and never shows a broken image. Set `logo` to override with a full URL
-  // (what you'll want in Wix, where assets live on static.wixstatic.com).
+  // if a mark ever needs to be served from somewhere else.
   const SPONSORS = [
     {
       group: 'Private Sector / Others',
@@ -147,9 +148,35 @@
 
   const FONT_SHEETS = [
     'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;800&display=swap',
-    'https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans/400.css',
-    'https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans/700.css',
   ];
+
+  // Resolve bundled assets against this script's own URL, not the page's, so
+  // the fonts still load when the component is embedded on a deeper route.
+  const SCRIPT_BASE = (document.currentScript && document.currentScript.src)
+    ? new URL('.', document.currentScript.src).href
+    : './';
+
+  /* Open Sauce Sans is self-hosted rather than pulled from Fontsource.
+   *
+   * The published @fontsource/open-sauce-sans package ships a CORRUPT
+   * 400-weight woff2 — it begins 0x80013311 instead of `wOF2`, and every
+   * browser rejects it with "OTS parsing error: invalid sfntVersion". Both
+   * jsDelivr and unpkg serve the same broken bytes, so it is the package, not
+   * a CDN edge. The .woff builds are fine, so 400 ships as woff and 700 gets
+   * woff2 with a woff fallback.
+   */
+  const FONT_FACES = `
+    @font-face {
+      font-family: 'Open Sauce Sans'; font-style: normal; font-weight: 400;
+      font-display: swap;
+      src: url('${SCRIPT_BASE}assets/fonts/open-sauce-sans-400.woff') format('woff');
+    }
+    @font-face {
+      font-family: 'Open Sauce Sans'; font-style: normal; font-weight: 700;
+      font-display: swap;
+      src: url('${SCRIPT_BASE}assets/fonts/open-sauce-sans-700.woff2') format('woff2'),
+           url('${SCRIPT_BASE}assets/fonts/open-sauce-sans-700.woff') format('woff');
+    }`;
 
   /* --------------------------------------------------------------- helpers */
 
@@ -167,6 +194,12 @@
       link.href = href;
       link.crossOrigin = 'anonymous';
       document.head.appendChild(link);
+    }
+    if (!document.head.querySelector('style[data-ukssc-fonts]')) {
+      const style = document.createElement('style');
+      style.dataset.uksscFonts = '';
+      style.textContent = FONT_FACES;
+      document.head.appendChild(style);
     }
   }
 
@@ -213,7 +246,7 @@
    * sets it, a flick decays into it, the buttons ease it. That is why this
    * replaced the CSS keyframe — a keyframe cannot be grabbed.
    */
-  function loopTrack(viewport, track, { autoplay = 0 } = {}) {
+  function loopTrack(viewport, track, { autoplay = 0, onClone = () => {} } = {}) {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const drift = reduced ? 0 : autoplay;
 
@@ -223,9 +256,34 @@
     let glide = null;                  // { from, to, t } while a button eases
     let raf = 0, prev = 0;
 
+    /* Two copies are only enough when one copy is at least as wide as the
+     * viewport. The offset wraps within [0, half), so the visible window can
+     * reach half + viewportWidth — any track shorter than that exposes blank
+     * space at the tail and the loop visibly breaks. The photo rail hit this on
+     * wide displays: one set is ~1958px, so at 2400px there was a 442px gap.
+     *
+     * Clone whole sets until the track covers it. Converges, so the
+     * ResizeObserver that calls this can't ping-pong.
+     */
     const measure = () => {
       const set = track.firstElementChild;
-      half = set ? set.getBoundingClientRect().width : 0;
+      if (!set) { half = 0; return; }
+
+      half = set.getBoundingClientRect().width;
+      if (half <= 0) return;
+
+      const need = Math.max(2, Math.ceil(viewport.clientWidth / half) + 1);
+      while (track.children.length < need) {
+        const clone = track.firstElementChild.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+        onClone(clone);
+      }
+      // Trim back when fewer are needed. Without this an early measurement
+      // taken before the logos have sized leaves the row permanently
+      // over-cloned — a set measured at placeholder width asks for far more
+      // copies than the final width needs.
+      while (track.children.length > need) track.lastElementChild.remove();
     };
     const wrap = (o) => (half > 0 ? ((o % half) + half) % half : 0);
     const paint = () => {
@@ -318,8 +376,11 @@
 
     // Images and webfonts land after first paint and change the track width, so
     // the wrap point has to be re-measured rather than read once.
+    // Watch the viewport too: how many copies are needed depends on its width,
+    // so a window resize can turn a sufficient track into a short one.
     const ro = new ResizeObserver(measure);
     ro.observe(track);
+    ro.observe(viewport);
 
     measure();
     paint();
@@ -796,7 +857,7 @@
   /* --------------------------------------------------------------- markup */
 
   // Text stand-ins used when artwork is absent — and restored at runtime if a
-  // URL 404s, which matters on Wix where these point at Media Manager.
+  // URL 404s, so a mistyped path is visible but never destructive.
   const ART_FALLBACK = {
     hero: `<span class="hero-word">Blastoff<span class="bang">!</span></span>`,
     tagline: `<p class="tagline">${esc(EVENT.tagline)}</p>`,
@@ -1004,13 +1065,19 @@
 
       loadFonts();
 
+      // Relative paths resolve against the script, not the document, so the
+      // folder works at any subpath. Absolute URLs pass through untouched.
+      const asset = (u) => (u && !/^([a-z]+:)?\/\/|^data:/i.test(u)
+        ? new URL(u, SCRIPT_BASE).href
+        : u);
+
       const cfg = {
         ...CONFIG,
         ticketsUrl: this.getAttribute('tickets-url') || CONFIG.ticketsUrl,
-        heroImage: this.getAttribute('hero-image') || CONFIG.heroImage,
-        taglineImage: this.getAttribute('tagline-image') || CONFIG.taglineImage,
-        crestImage: this.getAttribute('crest-image') || CONFIG.crestImage,
-        logoBase: this.getAttribute('logo-base') || CONFIG.logoBase,
+        heroImage: asset(this.getAttribute('hero-image') || CONFIG.heroImage),
+        taglineImage: asset(this.getAttribute('tagline-image') || CONFIG.taglineImage),
+        crestImage: asset(this.getAttribute('crest-image') || CONFIG.crestImage),
+        logoBase: asset(this.getAttribute('logo-base') || CONFIG.logoBase),
       };
 
       // attachShadow throws if one is already attached, which it is on re-render.
@@ -1022,11 +1089,13 @@
 
       this._loops = [];
       this._wireNav(root);
-      this._wireCarousel(root);
-      this._wireMarquees(root);
       this._wireFaqs(root);
+      // Size logos before the loops measure, so the wrap point is taken from
+      // final widths rather than placeholder ones.
       this._wireLogos(root);
       this._wireArtwork(root);
+      this._wireCarousel(root);
+      this._wireMarquees(root);
     }
 
     attributeChangedCallback() {
@@ -1095,7 +1164,10 @@
         const track = row.querySelector('.marquee-track');
         if (!track) return;
         const dir = Number(row.dataset.dir) || 1;
-        this._loops.push(loopTrack(row, track, { autoplay: MARQUEE_SPEED * dir }));
+        this._loops.push(loopTrack(row, track, {
+          autoplay: MARQUEE_SPEED * dir,
+          onClone: (node) => this._wireLogos(node),
+        }));
       });
     }
 
@@ -1104,7 +1176,7 @@
       this._loops = [];
     }
 
-    // A bad Media Manager URL should degrade to text, not a broken-image icon.
+    // A missing or mistyped artwork URL degrades to text, not a broken-image icon.
     _wireArtwork(root) {
       root.querySelectorAll('[data-art]').forEach((img) => {
         img.addEventListener('error', () => {
@@ -1115,8 +1187,14 @@
     }
 
     // No logo file yet? Fall back to the typeset name rather than a broken image.
-    _wireLogos(root) {
-      root.querySelectorAll('.logo-item img').forEach((img) => {
+    // Re-runnable, so a row cloned to fill a wide viewport gets sized as well —
+    // a clone made before its images decoded would otherwise keep the CSS
+    // placeholder height and not match the row it was copied from.
+    _wireLogos(scope) {
+      scope.querySelectorAll('.logo-item img').forEach((img) => {
+        if (img.dataset.sized) return;
+        img.dataset.sized = '1';
+
         const gold = img.closest('.logo-item').classList.contains('is-gold');
         const fallback = () => {
           const span = document.createElement('span');
