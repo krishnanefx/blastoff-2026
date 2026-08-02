@@ -468,9 +468,13 @@
     gap: 8px;
     margin-inline-end: clamp(40px, 5vw, 80px);
   }
+  /* Every file in assets/logos/ is pre-normalised to a 200px-tall transparent
+     canvas with the mark optically balanced inside it (see README), so height
+     alone is enough here. max-width is only a safety net for a hand-dropped
+     file — the widest baked canvas is Bank of America at 280px. */
   .logo-item img {
     display: block;
-    height: 56px; width: auto; max-width: 230px;
+    height: 56px; width: auto; max-width: 300px;
     object-fit: contain;
   }
   .logo-item .name {

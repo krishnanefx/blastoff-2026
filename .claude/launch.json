@@ -9,6 +9,10 @@
       ],
       "port": 4321,
       "autoPort": true
+    },
+    {
+      "name": "blastoff-live",
+      "url": "https://krishnanefx.github.io/blastoff-2026/"
     }
   ]
 }

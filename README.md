@@ -70,36 +70,71 @@ image. Slugs are in the `SPONSORS` array (`jpmorgan`, `pwc`, `uob`, `accenture`,
 `bofa`, `edb`, `mof`, `mas`, `mfa`, `moe`, `astar`, `lta`, `mot`, `scdf`, `ica`,
 `cnb`, `sps`, `htx`, …).
 
-Two things to know:
-
-- **The band is cream, not black, on purpose.** Most brand PNGs are dark artwork
-  on a transparent background. With the white cards removed, anything dark would
-  have vanished against `#141414` — AvePoint's wordmark especially. Knocking every
-  logo to white with a CSS filter would fix contrast but destroy brand colours
-  (bp's green, HSBC's red), which sponsor brand guidelines generally forbid.
-- **Prefer horizontal lockups.** Height normalisation makes portrait artwork look
-  optically small — bp is currently 960x1275, so at 56px tall it is only ~42px
-  wide and reads as smaller than HSBC. A wide lockup solves it.
+**The band is cream, not black, on purpose.** Most brand PNGs are dark artwork
+on a transparent background. With the white cards removed, anything dark would
+have vanished against `#141414` — AvePoint's wordmark especially. Knocking every
+logo to white with a CSS filter would fix contrast but destroy brand colours
+(bp's green, HSBC's red), which sponsor brand guidelines generally forbid.
 
 For Wix, set `logo` on a sponsor entry to a full `static.wixstatic.com` URL
 instead — that takes priority over the slug lookup.
 
-**4 of 22 logos are in place** (AvePoint, HSBC, bp, LSE). The rest are still
-name cards.
+**All 22 logos are in place.** 272KB for the set.
 
-> ### Do not auto-scrape the remaining logos
+### How the files are normalised
+
+Sponsor artwork arrives at wildly different aspect ratios — Bank of America is
+9.9:1, the ICA crest is 0.97:1. Equal *height* makes the crest read tiny and the
+wordmark read enormous, so each file is pre-baked to a **200px-tall transparent
+canvas** with the mark scaled by `(2.2 / aspect) ** 0.4` inside it: wide lockups
+sit shorter, tall crests fill the canvas. Everything then renders at one CSS
+height and lands at the same optical weight. This is what fixed bp — at 960x1275
+it used to read smaller than HSBC.
+
+Two source files arrived as opaque white rectangles (MFA, MOF) which would have
+shown as white boxes on the cream band; an edge flood fill strips them. PwC's SVG
+was 24% content and 76% padding, so everything is cropped to its alpha bounding
+box first. Files are then quantised to a 256-colour palette — 896KB to 221KB with
+no visible difference at 56px.
+
+**If you drop in a new raw logo, run it through the same pipeline** or it will
+not match the others:
+
+```bash
+python3 "tools/bake-logos.py" /path/to/raw-logos assets/logos
+```
+
+It needs Pillow and numpy, prints what it did to each file, and is idempotent —
+a already-baked file passes through unchanged.
+
+> ### Sourcing: what works, and what does not
 >
-> I tried. Clearbit's logo API is shut down, favicons are unusable (UOB returns
-> 16px), and Wikipedia scraping produced **wrong logos for 4 of 9** companies —
-> JPMorgan came back as "BANK ONE" (acquired 2004), PwC as "Coopers & Lybrand"
-> (pre-1998 merger), Bank of America as a defunct securities subsidiary, and UOB
-> as clipart of money. Wikipedia articles embed historical logos in the body and
-> a filename filter cannot tell them apart. Those four were deleted.
+> A previous attempt scraped Wikipedia *articles* with a filename filter and got
+> **wrong logos for 4 of 9** companies — JPMorgan as "BANK ONE" (acquired 2004),
+> PwC as "Coopers & Lybrand" (pre-1998 merger), Bank of America as a defunct
+> securities subsidiary, UOB as clipart of money. Articles embed historical logos
+> in the body and a filename filter cannot tell them apart. Clearbit's logo API is
+> shut down and favicons are unusable (UOB returns 16px).
 >
-> Putting a sponsor's dead predecessor brand on a sponsor wall is worse than
-> showing their name in text. Get the official files from each sponsor's brand
-> pack or press kit — they are third-party trademarks, and most brand guidelines
-> require the approved artwork anyway.
+> What worked, in order of reliability:
+>
+> 1. **Wikidata property `P154` (logo image).** A curated per-entity claim, not a
+>    filename guess. Resolved all five private-sector logos correctly and current
+>    — JPMorgan's 2024 rebrand, PwC's 2025 mark, UOB 2022.
+> 2. **English Wikipedia file namespace** (`srnamespace=6`). Where the Singapore
+>    statutory boards live; Wikidata `P154` coverage for them is thin and Commons
+>    has almost nothing.
+> 3. **The agency's own website.** Best for EDB, MOF and CNB.
+>
+> **Then look at every file before shipping it.** That is the step that was
+> missing. A search for CNB also returns the *Indian* Central Bureau of Narcotics,
+> SCDF's homepage header is a marathon campaign logo, and HTX's is the reverse
+> (white) variant that would have disappeared against the cream. None of those are
+> catchable from a filename — only by opening the image.
+>
+> These are third-party trademarks. For anything public-facing it is still worth
+> getting the approved artwork from each sponsor's brand pack, which most brand
+> guidelines require.
 
 ## Design fidelity
 
@@ -129,7 +164,10 @@ Note that cdnfonts, the usual Open Sauce host, is currently returning 500s.
 
 ## Still outstanding
 
-- **18 sponsor logos** — see above.
+- **Sponsor logo provenance** — all 22 are in and visually verified, but they came
+  from Wikidata, Wikipedia and agency websites rather than from the sponsors. Worth
+  swapping in brand-pack artwork for the ones that matter most, starting with EDB
+  (gold tier). HTX is a vertical purple tile — ask them for a horizontal lockup.
 - **Photo carousel** — deliberately empty grey plates, per your call. Add URLs to
   the `PHOTOS` array.
 - **FAQ copy** — the three Q&As are drafts written from the event details, marked
