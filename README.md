@@ -55,7 +55,13 @@ the top of the file.
 
 Two auto-scrolling rows — private sector left-to-right, government right-to-left
 — on a full-bleed cream band. Each row pauses on hover or keyboard focus. Every
-logo is normalised to **56px tall** (78px for gold tier) with no card around it.
+logo is normalised to **56px tall** with no card around it.
+
+A sponsor with a `tier` gets the gold treatment: **100px tall**, double the
+trailing margin, and a maroon `GOLD PARTNER` pill above the mark. Tier reads
+through size and isolation first; the pill is the confirmation, not the signal.
+The pill is maroon-on-cream (12:1) rather than amber-on-cream, which was 1.74:1
+and dissolved into the band.
 
 Each slot looks for `<logo-base><slug>.png`. **Drop a correctly-named file into
 `assets/logos/` and it appears** — no code change. Missing or broken files fall

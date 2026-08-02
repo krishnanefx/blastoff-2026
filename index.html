@@ -1,21 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blastoff! 2026 — UKSSC (local preview)</title>
-  <meta name="description" content="UKSSC Blastoff! 2026 — 14 August 2026, Suntec Convention Centre Level 3. Free admission.">
+  <meta name="theme-color" content="#141414">
+
+  <title>Blastoff! 2026 — UKSSC</title>
+  <meta name="description" content="Blastoff! 2026, the UKSSC's flagship careers event for overseas Singaporean students. 14 August 2026, 13:00–18:00, Suntec Convention Centre Level 3. Free admission.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blastoff! 2026 — UKSSC">
+  <meta property="og:description" content="To new heights: bigger, better, bolder! 14 August 2026 at Suntec Convention Centre. Free admission.">
+  <meta property="og:image" content="./assets/blastoff-wordmark.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="./assets/ukssc-crest.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
   <style>
     html, body { margin: 0; padding: 0; background: #141414; }
+    /* Reserve the fold so the yellow wordmark doesn't flash against white. */
+    ukssc-blastoff:not(:defined) { display: block; min-height: 100vh; }
   </style>
 </head>
 <body>
-  <!--
-    Local preview only. In Wix you do NOT use this file — you add a Custom
-    Element with tag name "ukssc-blastoff" and point it at blastoff-element.js.
-  -->
   <ukssc-blastoff></ukssc-blastoff>
-
   <script src="./blastoff-element.js"></script>
 </body>
 </html>
