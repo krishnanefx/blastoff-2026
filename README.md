@@ -55,10 +55,10 @@ the top of the file.
 
 Two auto-scrolling rows — private sector left-to-right, government right-to-left
 — on a full-bleed cream band. Each row pauses on hover or keyboard focus. Every
-logo is normalised to **56px tall** with no card around it.
+logo is normalised to **equal ink area** with no card around it (see below).
 
-A sponsor with a `tier` gets the gold treatment: **100px tall**, double the
-trailing margin, and a maroon `GOLD PARTNER` pill above the mark. Tier reads
+A sponsor with a `tier` gets the gold treatment: **double the ink area**, double
+the trailing margin, and a maroon `GOLD PARTNER` pill above the mark. Tier reads
 through size and isolation first; the pill is the confirmation, not the signal.
 The pill is maroon-on-cream (12:1) rather than amber-on-cream, which was 1.74:1
 and dissolved into the band.
@@ -84,12 +84,25 @@ instead — that takes priority over the slug lookup.
 ### How the files are normalised
 
 Sponsor artwork arrives at wildly different aspect ratios — Bank of America is
-9.9:1, the ICA crest is 0.97:1. Equal *height* makes the crest read tiny and the
-wordmark read enormous, so each file is pre-baked to a **200px-tall transparent
-canvas** with the mark scaled by `(2.2 / aspect) ** 0.4` inside it: wide lockups
-sit shorter, tall crests fill the canvas. Everything then renders at one CSS
-height and lands at the same optical weight. This is what fixed bp — at 960x1275
-it used to read smaller than HSBC.
+10:1, the HTX crest is 0.83:1. **Equal height is the wrong target.** At one
+shared height the wide wordmark carries several times the ink of the square
+crest, and the crest collapses into unreadable detail: HTX used to render its
+entire emblem into 46x56px.
+
+So logos are equalised by **ink area**, the standard for a sponsor wall. Each
+mark gets the same visual mass: wide lockups sit shorter and wider, square
+crests get taller. `sizeLogo()` computes it at load time from the file's own
+aspect ratio — `h = √(AREA / aspect)`, with `AREA = 10000` px², clamped to
+30–104px tall and 300px wide so a 10:1 lockup can't run away.
+
+Measured across the 22 logos, that took the spread in rendered area from
+**3.7× down to 1.25×**. HTX went from 46x56 to 86x104 — 3.5 times the area.
+Gold tier gets double the ink budget, i.e. √2 on each edge.
+
+Because it is computed from the image rather than baked in, **a new logo
+self-sizes** — no per-file tuning. Files must be cropped tight to their artwork
+though, since padding would be read as part of the mark; `tools/crop-logos.py`
+does that.
 
 Two source files arrived as opaque white rectangles (MFA, MOF) which would have
 shown as white boxes on the cream band; an edge flood fill strips them. PwC's SVG
@@ -98,14 +111,21 @@ box first. Files are then quantised to a 256-colour palette — 896KB to 221KB w
 no visible difference at 56px.
 
 **If you drop in a new raw logo, run it through the same pipeline** or it will
-not match the others:
+not match the others. Put the original in `tools/logo-sources/` and re-bake the
+whole set:
 
 ```bash
-python3 "tools/bake-logos.py" /path/to/raw-logos assets/logos
+python3 "tools/bake-logos.py" tools/logo-sources assets/logos
 ```
 
-It needs Pillow and numpy, prints what it did to each file, and is idempotent —
-a already-baked file passes through unchanged.
+Needs Pillow and numpy. Running it on the 22 sources reproduces the shipped
+files byte-for-byte, so it is safe to re-run.
+
+Bake from `tools/logo-sources/`, **not** from `assets/logos/` — the output is
+cropped to its content box, so re-baking already-baked files drifts (it refuses
+to run in-place, but a copy would still slowly degrade). The sources are kept
+in the repo for exactly this reason: changing `CANVAS_H` or the normalisation
+curve means re-baking everything from the originals.
 
 > ### Sourcing: what works, and what does not
 >

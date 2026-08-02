@@ -170,6 +170,35 @@
     }
   }
 
+  /* Equalise logos by ink AREA rather than by height.
+   *
+   * Equal height is what makes a sponsor wall look wrong: Bank of America's
+   * lockup is 10:1 and HTX's crest is 0.83:1, so at one shared height the
+   * wordmark carries ~4x the ink of the crest and the crest becomes unreadable
+   * detail. Equal area gives both the same visual mass — wide lockups sit
+   * shorter and wider, square crests get taller.
+   *
+   * AREA is the ink budget in CSS px². Derived from the target: a 1:1 crest
+   * lands at 100px tall, a 3:1 wordmark at ~58px, a 10:1 lockup at ~32px.
+   */
+  const LOGO = { AREA: 10000, MIN_H: 30, MAX_H: 104, MAX_W: 300 };
+
+  function sizeLogo(img, gold) {
+    const r = img.naturalWidth / img.naturalHeight;
+    if (!r || !isFinite(r)) return;
+
+    // Gold gets double the ink, i.e. √2 on each edge.
+    const area = gold ? LOGO.AREA * 2 : LOGO.AREA;
+    const maxH = gold ? LOGO.MAX_H * 1.35 : LOGO.MAX_H;
+    const maxW = gold ? LOGO.MAX_W * 1.27 : LOGO.MAX_W;
+
+    let h = Math.min(Math.max(Math.sqrt(area / r), LOGO.MIN_H), maxH);
+    if (h * r > maxW) h = maxW / r;   // width cap wins; a 10:1 mark can't run away
+
+    img.style.height = h.toFixed(1) + 'px';
+    img.style.width = (h * r).toFixed(1) + 'px';
+  }
+
   const CHEVRON = `
     <svg class="chev" viewBox="0 0 36 17.67" aria-hidden="true" focusable="false">
       <path d="M1.7 1.7 18 15.97 34.3 1.7" fill="none" stroke="currentColor"
@@ -372,24 +401,24 @@
   .rail-btn svg { width: 20px; height: 20px; }
 
   .carousel { margin-top: clamp(40px, 7vw, 86px); }
+  /* Transform track rather than a native scroller, so the rail can wrap past
+     its own end instead of stopping. `pan-y` keeps vertical page scrolling with
+     the browser and claims only the horizontal axis for the drag. */
   .rail {
-    display: flex; gap: clamp(14px, 1.5vw, 20px);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
+    overflow: hidden;
     padding-bottom: 4px;
-    scroll-padding-inline-start: max(var(--pad), calc((100% - var(--maxw)) / 2));
     cursor: grab;
+    touch-action: pan-y;
   }
-  .rail::-webkit-scrollbar { display: none; }
-  .rail.is-dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; }
+  .rail.is-dragging { cursor: grabbing; }
+  .rail-track { display: flex; width: max-content; will-change: transform; }
+  .rail-set { display: flex; }
   .plate {
     flex: 0 0 auto;
     height: clamp(220px, 31vw, 445px);
+    margin-inline-end: clamp(14px, 1.5vw, 20px);
     background: var(--plate);
     border-radius: var(--radius);
-    scroll-snap-align: start;
     overflow: hidden;
   }
   .plate.sm { width: clamp(230px, 40vw, 342px); }
@@ -448,14 +477,16 @@
   }
   .marquee + .wrap { margin-top: clamp(26px, 3.4vw, 42px); }
 
-  .marquee { overflow: hidden; }
-  .marquee-track {
-    display: flex; width: max-content;
-    animation: marquee-scroll var(--dur, 48s) linear infinite;
+  /* Driven by script rather than a CSS animation: a keyframe cannot be dragged.
+     Same continuous drift, but the offset is now a number the pointer, the
+     trackpad and the arrow keys can all push around. */
+  .marquee {
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;
   }
-  .marquee[data-dir="-1"] .marquee-track { animation-direction: reverse; }
-  .marquee:hover .marquee-track,
-  .marquee:focus-within .marquee-track { animation-play-state: paused; }
+  .marquee.is-dragging { cursor: grabbing; }
+  .marquee-track { display: flex; width: max-content; will-change: transform; }
   .marquee-set { display: flex; }
 
   /* Spacing lives on the item, not as a flex gap: the track is exactly two
@@ -468,13 +499,12 @@
     gap: 8px;
     margin-inline-end: clamp(40px, 5vw, 80px);
   }
-  /* Every file in assets/logos/ is pre-normalised to a 200px-tall transparent
-     canvas with the mark optically balanced inside it (see README), so height
-     alone is enough here. max-width is only a safety net for a hand-dropped
-     file — the widest baked canvas is Bank of America at 280px. */
+  /* Height and width are set per-logo by _wireLogos once the file has loaded —
+     equal ink AREA, not equal height (see sizeLogo). These values only cover
+     the moment before load and the case where scripting is unavailable. */
   .logo-item img {
     display: block;
-    height: 56px; width: auto; max-width: 300px;
+    height: 64px; width: auto; max-width: 300px;
     object-fit: contain;
   }
   .logo-item .name {
@@ -485,11 +515,10 @@
     line-height: 1.25; letter-spacing: -0.01em;
     color: var(--ink); text-align: center;
   }
-  /* Gold reads through size and isolation first, the badge second. 78px was
-     only a 40% step over 56px and got lost next to wide lockups. max-width
-     rises with the height or object-fit would letterbox a horizontal lockup
-     back down below 100px tall and undo the bump. */
-  .logo-item.is-gold img,
+  /* Gold reads through size and isolation first, the badge second. For images
+     the bump is applied as double ink area in sizeLogo; this covers the text
+     fallback and the pre-load state. */
+  .logo-item.is-gold img { max-width: 380px; }
   .logo-item.is-gold .name { height: 100px; max-width: 320px; }
   /* Extra air on both sides. Safe for the loop: both copies of the set carry
      the same margins, so the track stays exactly 2x the set width. */
@@ -951,13 +980,19 @@
     // No logo file yet? Fall back to the typeset name rather than a broken image.
     _wireLogos(root) {
       root.querySelectorAll('.logo-item img').forEach((img) => {
+        const gold = img.closest('.logo-item').classList.contains('is-gold');
         const fallback = () => {
           const span = document.createElement('span');
           span.className = 'name';
           span.textContent = img.dataset.name;
           img.replaceWith(span);
         };
-        if (img.complete && img.naturalWidth === 0) { fallback(); return; }
+        const size = () => sizeLogo(img, gold);
+        if (img.complete) {
+          img.naturalWidth > 0 ? size() : fallback();
+          return;
+        }
+        img.addEventListener('load', size, { once: true });
         img.addEventListener('error', fallback, { once: true });
       });
     }
