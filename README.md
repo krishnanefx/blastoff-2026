@@ -54,7 +54,9 @@ the top of the file.
 ## Sponsor logo carousel
 
 Two auto-scrolling rows — private sector left-to-right, government right-to-left
-— on a full-bleed cream band. Each row pauses on hover or keyboard focus. Every
+— on a full-bleed cream band. Each row pauses on hover or keyboard focus, and can
+be dragged, flicked, trackpad-scrolled or arrow-keyed (see [Carousels](#carousels)
+below). Every
 logo is normalised to **equal ink area** with no card around it (see below).
 
 A sponsor with a `tier` gets the gold treatment: **double the ink area**, double
@@ -104,11 +106,44 @@ self-sizes** — no per-file tuning. Files must be cropped tight to their artwor
 though, since padding would be read as part of the mark; `tools/crop-logos.py`
 does that.
 
-Two source files arrived as opaque white rectangles (MFA, MOF) which would have
-shown as white boxes on the cream band; an edge flood fill strips them. PwC's SVG
-was 24% content and 76% padding, so everything is cropped to its alpha bounding
-box first. Files are then quantised to a 256-colour palette — 896KB to 221KB with
-no visible difference at 56px.
+PwC's SVG was 24% content and 76% padding, so everything is cropped to its alpha
+bounding box first. Files are then quantised to a 256-colour palette — 896KB to
+221KB with no visible difference at 56px.
+
+### Getting white backgrounds off
+
+Two source files arrived flattened onto opaque white (MFA, MOF), which would have
+shown as white boxes on the cream band. There are two fixes and they are not
+interchangeable:
+
+**Edge flood fill** (`strip_white_box`, the default) walks in from the borders.
+It is safe for any logo, because it only removes white that is connected to the
+outside — brand white stays put. But it cannot reach white that ink encloses.
+That is why MOF's "O" kept a solid white disc in its counter: the letter ring
+seals it off. Raising the threshold does not help; it just trades the disc for a
+hard white halo along every anti-aliased edge.
+
+**Un-matting** (`unmatte_white`, opt-in via `INK_ON_WHITE`) solves the compositing
+that produced the file instead. Each pixel is ink `C` over white at coverage `a`:
+
+```
+observed = a*C + (1 - a)*255   ->   a = 1 - min(R,G,B)/255
+                                    C = (observed - 255*(1 - a)) / a
+```
+
+White becomes `a=0`, solid ink `a=1`, and a half-covered edge pixel returns as
+full-strength ink at 50% alpha — anti-aliasing intact, no halo. Taking coverage
+from the *minimum* channel keeps colour, so MOF's red "SINGAPORE" survives (its
+saturation actually improves, since un-premultiplying recovers full-strength ink).
+A `FLOOR` of 0.03 discards near-white that is not quite 255 — exports are often
+253, and without the floor every background pixel stays faintly opaque, enough to
+defeat the bbox crop and veil the canvas.
+
+**Only add a slug to `INK_ON_WHITE` if the artwork has no meaningful white.** It
+removes *all* white, everywhere. Most of the set would be destroyed by it: HSBC's
+hexagon segments, LSE's white letters on red, bp's sunburst, the white "HTX" on
+its purple tile, and the MFA/ICA/SPS/SCDF crests all contain real white. MOF is
+the only flattened wordmark in the set, so the list is just `{'mof'}`.
 
 **If you drop in a new raw logo, run it through the same pipeline** or it will
 not match the others. Put the original in `tools/logo-sources/` and re-bake the
@@ -155,6 +190,41 @@ curve means re-baking everything from the originals.
 > These are third-party trademarks. For anything public-facing it is still worth
 > getting the approved artwork from each sponsor's brand pack, which most brand
 > guidelines require.
+
+## Carousels
+
+Both sponsor rows and the photo rail run on one engine, `loopTrack()`. Each track
+holds exactly two copies of its content, so wrapping the offset modulo one copy's
+width is seamless **in both directions** — there is no start or end to hit, and a
+drag can keep going either way forever.
+
+| Input | Behaviour |
+| ----- | --------- |
+| Drag (mouse or touch) | Grabs the row; a flick carries on and decays |
+| Trackpad swipe | Horizontal deltas only |
+| `Shift` + wheel | Same, for a one-axis mouse |
+| `←` `→` | Steps one plate (rail) or 80% of a screen (rows) |
+| Hover / focus | Holds the sponsor-row drift while you read it |
+| Photo arrows | Step one plate; never disabled, since there is no end |
+
+Everything is driven from one `offset` number that autoplay adds to, a drag sets,
+a flick decays into and the buttons ease. That is why the sponsor rows are no
+longer a CSS keyframe: **a keyframe cannot be grabbed.** The rows drift at a fixed
+44 px/sec rather than a fixed duration, so the 13-logo row moves at the same rate
+as the 9-logo one.
+
+Two things worth not breaking:
+
+- **Plate and logo spacing is a trailing `margin`, never a flex `gap`.** The loop
+  only lands seamlessly if every item carries its own trailing space; a gap leaves
+  a half-gap jump at the seam.
+- **A plain vertical wheel is deliberately not consumed.** Only horizontal intent
+  is taken, so the page still scrolls normally over a carousel — swallowing that
+  is what makes a carousel feel like a trap.
+
+`touch-action: pan-y` claims the horizontal axis for the drag while leaving
+vertical page scrolling to the browser. Under `prefers-reduced-motion` the drift
+stops but every manual input still works.
 
 ## Design fidelity
 

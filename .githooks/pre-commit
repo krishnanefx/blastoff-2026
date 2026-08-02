@@ -1,0 +1,17 @@
+#!/bin/sh
+# Refuse to commit a blastoff-element.js that does not parse.
+#
+# This exists because a stray backtick inside the CSS template literal once
+# terminated the string, broke the whole component, and was pushed live before
+# anyone noticed. A parse check is cheap; a dead landing page is not.
+if git diff --cached --name-only | grep -q '^blastoff-element\.js$'; then
+  tmp=$(mktemp /tmp/blastoff-check-XXXXXX.js)
+  git show :blastoff-element.js > "$tmp"
+  if ! node --check "$tmp" 2>&1; then
+    rm -f "$tmp"
+    echo ""
+    echo "commit refused: blastoff-element.js has a syntax error (see above)."
+    exit 1
+  fi
+  rm -f "$tmp"
+fi

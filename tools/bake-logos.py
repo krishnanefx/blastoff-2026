@@ -27,6 +27,45 @@ F_MAX    = 1.00
 MAX_ASPECT = 5.0        # cap canvas aspect so nothing blows past CSS max-width
 SENTINEL = (1, 2, 3)
 
+# Artwork that is pure ink printed on white, with no white that means anything.
+# These get un-matted instead of edge-filled: see unmatte_white. Do NOT add a
+# logo whose design contains real white (MFA's shield, MAS's navy panel, the
+# ICA and SPS crests) — it would be eaten.
+INK_ON_WHITE = {'mof'}
+
+
+def unmatte_white(im):
+    """Recover alpha from artwork that was flattened onto a white background.
+
+    An edge flood fill cannot reach white that is enclosed by ink — the counter
+    of MOF's "O" stayed a solid white disc on the cream band. Raising the
+    threshold does not help either; it just trades the disc for a hard white
+    halo where the letter is anti-aliased.
+
+    Instead, solve the compositing that produced the file. Each pixel is ink C
+    laid over white at coverage a:  observed = a*C + (1 - a)*255. The darkest
+    channel gives the coverage, and the rest recovers the ink:
+
+        a = 1 - min(R,G,B)/255        C = (observed - 255*(1 - a)) / a
+
+    White goes to a=0, solid ink to a=1, and a half-covered edge pixel comes
+    back as full-strength ink at 50% alpha — so the anti-aliasing survives and
+    there is no halo. Coloured ink is preserved: MOF's red "SINGAPORE" keeps its
+    hue because only the coverage is taken from the minimum channel.
+    """
+    src = np.array(im.convert('RGB')).astype(np.float32)
+    a = 1.0 - src.min(axis=2) / 255.0
+    # Scanned/exported "white" is often 253, not 255, which would leave every
+    # background pixel faintly opaque — enough to defeat the bbox crop and lay a
+    # grey veil over the whole canvas. Rescale so anything lighter than FLOOR is
+    # fully clear, keeping the ramp continuous so edges stay smooth.
+    FLOOR = 0.03
+    a = np.clip((a - FLOOR) / (1.0 - FLOOR), 0.0, 1.0)
+    safe = np.maximum(a, 1e-4)[..., None]
+    ink = np.clip((src - 255.0 * (1.0 - a[..., None])) / safe, 0, 255)
+    out = np.dstack([ink, a[..., None] * 255.0]).astype(np.uint8)
+    return Image.fromarray(out, 'RGBA')
+
 
 def strip_white_box(im):
     """Flood fill an opaque near-white background from the edges to transparent."""
@@ -56,7 +95,12 @@ def strip_white_box(im):
 
 def bake(path):
     im = Image.open(path).convert('RGBA')
-    im, stripped = strip_white_box(im)
+    slug = os.path.splitext(os.path.basename(path))[0]
+    if slug in INK_ON_WHITE:
+        im, stripped = unmatte_white(im), 'unmatted'
+    else:
+        im, edge = strip_white_box(im)
+        stripped = 'white-box-stripped' if edge else ''
 
     bb = im.getchannel('A').getbbox()
     if bb:
@@ -106,7 +150,7 @@ if __name__ == '__main__':
         out, info = bake(os.path.join(src, fn))
         nbytes, quantised = save(out, os.path.join(dst, fn))
         r56 = (round(out.width * 56 / CANVAS_H), 56)
-        notes = ' '.join(filter(None, ['white-box-stripped' if info['stripped'] else '',
+        notes = ' '.join(filter(None, [info['stripped'],
                                        'quantised' if quantised else 'rgba']))
         print(f'{fn[:-4]:11} {str(info["src"]):11} {info["aspect"]:5.2f} {info["f"]:5.2f} '
               f'{str(info["out"]):11} {str(r56):11} {nbytes/1024:7.1f}K  {notes}')
