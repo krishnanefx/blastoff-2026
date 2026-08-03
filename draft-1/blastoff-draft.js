@@ -5,8 +5,9 @@
  * Lives at /draft-1/ and reads its artwork from ../assets/.
  *
  * Built to the design review: the hero states the proposition before the
- * identity, the ticket CTA is a solid button rather than a link, copy names
- * concrete outcomes instead of marketing verbs, and the starfield is animated.
+ * identity, the ticket CTA is a solid button rather than a link, and copy
+ * names concrete outcomes instead of marketing verbs. Background is the flat
+ * #141414 the live site uses — no starfield, blooms, grain or cursor glow.
  *
  * COPY TO CONFIRM (marked TODO below): whether 400+/30/40 are historical or
  * projected, and whether every listed organisation is actively hiring.
@@ -265,7 +266,7 @@
 
   const CSS = `
   :host {
-    --void:#07080C;
+    --ink:#141414;
     --yellow:#DFFF3E;
     --mint:#ADF8F5;
     --cream:#FFF6E7;
@@ -288,7 +289,7 @@
 
     display:block;
     position:relative;
-    background:var(--void);
+    background:var(--ink);
     color:var(--text);
     font-family:var(--display);
     -webkit-font-smoothing:antialiased;
@@ -300,22 +301,6 @@
   a{color:inherit;}
   :where(a,button):focus-visible{outline:3px solid var(--yellow);outline-offset:3px;}
 
-  /* ---- cosmos ---- */
-  .sky{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
-  .stars{position:absolute;inset:0;display:block;width:100%;height:100%;}
-  .bloom{position:absolute;border-radius:50%;filter:blur(90px);opacity:.4;}
-  .bloom.a{width:56vw;height:56vw;right:-14vw;top:-10vh;
-    background:radial-gradient(circle,rgba(120,255,214,.24),transparent 68%);}
-  .bloom.b{width:46vw;height:46vw;left:-16vw;top:46vh;
-    background:radial-gradient(circle,rgba(255,196,92,.15),transparent 70%);}
-  .grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.055;
-    mix-blend-mode:overlay;background-repeat:repeat;background-size:180px 180px;}
-  .glow{position:fixed;width:680px;height:680px;border-radius:50%;pointer-events:none;
-    z-index:0;opacity:0;transition:opacity .6s ease;transform:translate(-50%,-50%);
-    background:radial-gradient(circle,rgba(223,255,62,.08),transparent 62%);}
-  .glow.is-on{opacity:1;}
-  @media (hover:none){ .glow{display:none;} }
-
   .progress{position:fixed;left:0;top:0;height:2px;width:100%;z-index:45;pointer-events:none;}
   .progress i{display:block;height:100%;width:0;background:var(--yellow);}
 
@@ -324,7 +309,7 @@
   /* ---- nav ---- */
   .nav{position:sticky;top:0;z-index:35;display:flex;align-items:center;
     justify-content:space-between;gap:20px;padding:14px var(--pad);
-    background:linear-gradient(180deg,rgba(7,8,12,.94),rgba(7,8,12,.6));
+    background:linear-gradient(180deg,rgba(20,20,20,.94),rgba(20,20,20,.6));
     backdrop-filter:blur(10px);border-bottom:1px solid var(--hair-soft);font-family:var(--ui);}
   .brand{display:flex;align-items:center;gap:9px;text-decoration:none;font-weight:800;
     font-size:15px;letter-spacing:.02em;text-transform:uppercase;color:var(--bright);
@@ -345,7 +330,7 @@
   .nav-toggle .x{display:none;}
   .nav[data-open="true"] .nav-toggle .bars{display:none;}
   .nav[data-open="true"] .nav-toggle .x{display:block;}
-  .scrim{position:fixed;inset:0;z-index:34;background:rgba(3,4,7,.6);
+  .scrim{position:fixed;inset:0;z-index:34;background:rgba(0,0,0,.62);
     opacity:0;pointer-events:none;transition:opacity .3s ease;}
 
   /* ---- buttons: one obvious primary ---- */
@@ -354,7 +339,7 @@
     font-family:var(--ui);font-weight:700;font-size:15px;letter-spacing:.02em;
     text-decoration:none;cursor:pointer;text-align:center;
     transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease;}
-  .btn-solid{background:var(--yellow);color:#07080C;}
+  .btn-solid{background:var(--yellow);color:var(--ink);}
   .btn-solid:hover{transform:translateY(-2px);background:#EAFF6B;}
   .btn-outline{background:transparent;color:var(--bright);border-color:rgba(255,255,255,.32);}
   .btn-outline:hover{border-color:var(--yellow);color:var(--yellow);}
@@ -375,7 +360,7 @@
      proposition, which is the thing a first-time visitor actually needs. */
   .mark{position:relative;display:inline-block;width:min(880px,72%);}
   .mark img{display:block;width:100%;height:auto;
-    filter:drop-shadow(0 0 54px rgba(223,255,62,.2));}
+    filter:drop-shadow(0 0 40px rgba(223,255,62,.13));}
   .spark{position:absolute;width:clamp(15px,1.7vw,24px);height:auto;color:var(--yellow);}
   .spark.one{top:-8%;right:-4%;}
   .spark.two{bottom:-2%;left:-5%;width:clamp(10px,1.2vw,17px);}
@@ -479,8 +464,8 @@
     padding-right:clamp(13px,1.3vw,17px);margin-right:clamp(13px,1.3vw,17px);
     border-right:1px solid rgba(255,255,255,.18);
     transition:color .22s ease,border-color .22s ease;}
-  .pill:hover{background:var(--yellow);color:#07080C;border-color:var(--yellow);}
-  .pill:hover i{color:rgba(7,8,12,.5);border-right-color:rgba(7,8,12,.22);}
+  .pill:hover{background:var(--yellow);color:var(--ink);border-color:var(--yellow);}
+  .pill:hover i{color:rgba(20,20,20,.5);border-right-color:rgba(20,20,20,.22);}
   :host(.reveal-on) .pill.is-in{animation-delay:calc(var(--i) * 70ms);}
   @media (max-width:760px){
     .pills{--step:0px;align-items:stretch;}
@@ -607,7 +592,7 @@
   /* ---- sticky dock ---- */
   .dock{position:fixed;left:0;right:0;bottom:0;z-index:38;transform:translateY(110%);
     display:flex;align-items:center;justify-content:space-between;gap:14px;
-    padding:11px var(--pad);background:rgba(7,8,12,.96);
+    padding:11px var(--pad);background:rgba(20,20,20,.96);
     border-top:1px solid var(--hair);backdrop-filter:blur(12px);
     transition:transform .38s cubic-bezier(.2,.8,.2,1);font-family:var(--ui);}
   .dock.is-up{transform:none;}
@@ -639,7 +624,7 @@
        the page and leaves a block of empty black behind it. */
     .nav-list{position:fixed;top:0;right:0;bottom:0;width:min(86vw,360px);
       z-index:36;flex-direction:column;align-items:stretch;justify-content:center;
-      gap:4px;padding:84px 28px 40px;background:rgba(10,11,16,.985);
+      gap:4px;padding:84px 28px 40px;background:rgba(20,20,20,.985);
       border-left:1px solid var(--hair);overflow-y:auto;
       transform:translateX(101%);transition:transform .32s cubic-bezier(.2,.8,.2,1);}
     .nav[data-open="true"] .nav-list{transform:none;}
@@ -858,13 +843,6 @@
     return '' +
     '<div class="progress" aria-hidden="true"><i></i></div>' +
 
-    '<div class="sky" aria-hidden="true">' +
-      '<canvas class="stars"></canvas>' +
-      '<div class="bloom a"></div><div class="bloom b"></div>' +
-    '</div>' +
-    '<div class="glow" aria-hidden="true"></div>' +
-    '<div class="grain" aria-hidden="true"></div>' +
-
     '<div class="page">' +
       '<nav class="nav" data-open="false" aria-label="Primary">' +
         '<a class="brand" href="#top"><img src="' + esc(CONFIG.crestImage) + '" alt="">The UKSSC</a>' +
@@ -1071,9 +1049,6 @@
       root.append(document.createRange().createContextualFragment(template()));
 
       this._hardenClones(root);
-      this._starfield(root);
-      this._grain(root);
-      this._glow(root);
       this._progress(root);
       this._nav(root);
       this._logos(root);
@@ -1092,7 +1067,6 @@
       (this._loops || []).forEach((l) => l.stop());
       this._loops = [];
       if (this._tick) clearInterval(this._tick);
-      if (this._stars) this._stars();
       if (this._progStop) this._progStop();
       if (this._revealGuard) clearTimeout(this._revealGuard);
       if (this._pillFit) this._pillFit();
@@ -1105,129 +1079,6 @@
     _hardenClones(root) {
       root.querySelectorAll('.rail-set[aria-hidden="true"],.marquee-set[aria-hidden="true"]')
         .forEach(hideDuplicate);
-    }
-
-    /* An animated starfield, drawn rather than shipped as an image.
-     *
-     * The canvas is viewport-sized and fixed, not page-height. A page-tall
-     * canvas would be up to 4000px and far too expensive to repaint every
-     * frame; scroll is faked instead by offsetting each star's y by the scroll
-     * position times its depth and wrapping modulo the height, which also makes
-     * the field effectively infinite.
-     *
-     * Twinkle is a sine on each star's own phase and speed, so they shimmer
-     * independently rather than pulsing in unison. Honours reduced motion by
-     * painting a single static frame and never starting the loop.
-     */
-    _starfield(root) {
-      const canvas = root.querySelector('.stars');
-      if (!canvas || !canvas.getContext) return;
-      const ctx = canvas.getContext('2d');
-
-      let stars = [], w = 0, h = 0;
-
-      const build = () => {
-        const dpr = Math.min(2, devicePixelRatio || 1);
-        w = innerWidth;
-        h = innerHeight;
-        if (!w || !h) return;
-        canvas.width = Math.round(w * dpr);
-        canvas.height = Math.round(h * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        // Deterministic scatter — the same sky every load, no reshuffle on resize.
-        const count = Math.min(460, Math.round((w * h) / 3400));
-        stars = [];
-        for (let i = 0; i < count; i++) {
-          stars.push({
-            x: ((i * 0.6180339887498949) % 1) * w,
-            y: ((i * 0.4142135623730951) % 1) * h,
-            r: 0.35 + ((i * 7919) % 100) / 100 * 1.15,
-            a: 0.14 + ((i * 6151) % 100) / 100 * 0.6,
-            phase: ((i * 3571) % 628) / 100,
-            speed: 0.5 + ((i * 2749) % 100) / 100 * 1.7,
-            depth: 0.25 + ((i * 5381) % 100) / 100 * 0.85,
-            warm: (i * 6151) % 100 > 88,
-          });
-        }
-      };
-
-      const paint = (t) => {
-        if (!w || !h) return;
-        ctx.clearRect(0, 0, w, h);
-        const sy = window.scrollY || 0;
-        for (const s of stars) {
-          let y = (s.y - sy * s.depth * 0.06) % h;
-          if (y < 0) y += h;
-          const tw = t === null ? 1 : 0.55 + 0.45 * Math.sin(t * s.speed + s.phase);
-          ctx.globalAlpha = Math.max(0, Math.min(1, s.a * tw));
-          ctx.fillStyle = s.warm ? '#DFFF3E' : '#FFFFFF';
-          ctx.beginPath();
-          ctx.arc(s.x, y, s.r, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-      };
-
-      build();
-
-      if (reduced()) {
-        paint(null);
-        const onResize = () => { build(); paint(null); };
-        window.addEventListener('resize', onResize);
-        window.addEventListener('scroll', onResize, { passive: true });
-        this._stars = () => {
-          window.removeEventListener('resize', onResize);
-          window.removeEventListener('scroll', onResize);
-        };
-        return;
-      }
-
-      let raf = 0;
-      const loop = (now) => {
-        paint(now / 1000);
-        raf = requestAnimationFrame(loop);
-      };
-      raf = requestAnimationFrame(loop);
-
-      const onResize = () => build();
-      window.addEventListener('resize', onResize);
-      this._stars = () => {
-        cancelAnimationFrame(raf);
-        window.removeEventListener('resize', onResize);
-      };
-    }
-
-    _grain(root) {
-      const el = root.querySelector('.grain');
-      if (!el) return;
-      const n = 180;
-      const c = document.createElement('canvas');
-      c.width = c.height = n;
-      const ctx = c.getContext('2d');
-      const img = ctx.createImageData(n, n);
-      for (let i = 0; i < img.data.length; i += 4) {
-        const p = i / 4;
-        const v = (((p * 1103515245 + 12345) >>> 8) % 256);
-        img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
-        img.data[i + 3] = 26;
-      }
-      ctx.putImageData(img, 0, 0);
-      el.style.backgroundImage = 'url(' + c.toDataURL('image/png') + ')';
-    }
-
-    _glow(root) {
-      const glow = root.querySelector('.glow');
-      if (!glow || matchMedia('(hover:none)').matches || reduced()) return;
-      let raf = 0, x = 0, y = 0;
-      const move = () => { raf = 0; glow.style.left = x + 'px'; glow.style.top = y + 'px'; };
-      this.addEventListener('pointermove', (e) => {
-        if (e.pointerType !== 'mouse') return;
-        x = e.clientX; y = e.clientY;
-        glow.classList.add('is-on');
-        if (!raf) raf = requestAnimationFrame(move);
-      });
-      this.addEventListener('pointerleave', () => glow.classList.remove('is-on'));
     }
 
     _progress(root) {
