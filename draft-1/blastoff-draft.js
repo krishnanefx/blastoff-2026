@@ -458,14 +458,21 @@
   .fig span{font-size:clamp(14px,1.5vw,17px);line-height:1.55;}
 
   /* ---- what you can do ---- */
-  .pills{--step:clamp(16px,4.4vw,74px);display:flex;flex-direction:column;
-    gap:clamp(10px,1.2vw,14px);align-items:flex-start;}
+  /* The step is a PERCENTAGE of the pill column, not a vw unit. Viewport units
+     kept overshooting once the 1320px column stopped growing — on an ultra-wide
+     screen a vw-based step pushed the last capsule past the right edge. 11% of
+     the container lands the fifth capsule flush with the margin at every width. */
+  .pills{--step:7.6%;display:flex;flex-direction:column;
+    gap:clamp(11px,1.6vw,22px);align-items:flex-start;}
   .pill{display:flex;align-items:baseline;
     margin-left:calc(var(--i) * var(--step));
-    padding:clamp(12px,1.4vw,17px) clamp(24px,2.4vw,34px);
+    /* Never wider than the space left after its own indent, so a long line
+       wraps instead of breaking out of the column. */
+    max-width:calc(100% - var(--i) * var(--step));
+    padding:clamp(12px,1.5vw,20px) clamp(24px,2.6vw,40px);
     border:1px solid rgba(255,255,255,.26);border-radius:999px;
     background:rgba(255,255,255,.022);
-    font-size:clamp(15px,1.7vw,21px);letter-spacing:-.015em;color:var(--bright);
+    font-size:clamp(15px,2vw,27px);letter-spacing:-.02em;color:var(--bright);
     transition:background .22s ease,color .22s ease,border-color .22s ease;}
   .pill i{flex:0 0 auto;font-style:normal;font-family:var(--ui);font-weight:700;
     font-size:11px;letter-spacing:.08em;color:var(--yellow);
@@ -476,8 +483,17 @@
   .pill:hover i{color:rgba(7,8,12,.5);border-right-color:rgba(7,8,12,.22);}
   :host(.reveal-on) .pill.is-in{animation-delay:calc(var(--i) * 70ms);}
   @media (max-width:760px){
-    .pills{align-items:stretch;}
-    .pill{margin-left:0;}
+    .pills{--step:0px;align-items:stretch;}
+    .pill{margin-left:0;max-width:100%;}
+  }
+
+  /* Give the panel the full fold on desktop and centre the group in it, so the
+     section reads as a full-page statement rather than a band of content with
+     dead air under it. */
+  @media (min-width:900px){
+    .doing{min-height:calc(100svh - 96px);display:flex;flex-direction:column;
+      justify-content:center;gap:clamp(36px,5vw,72px);}
+    .doing .pills{margin-top:0 !important;}
   }
 
   /* ---- immersive gallery ---- */
@@ -914,9 +930,11 @@
           '</section>' +
 
           '<section class="sec" id="why">' +
-            eyebrow('02', 'Why go') +
-            '<h2 style="max-width:18ch">What you can do at <em>Blastoff!</em></h2>' +
-            '<div class="pills" style="margin-top:clamp(34px,4.6vw,64px)">' + doings + '</div>' +
+            '<div class="doing">' +
+              '<div>' + eyebrow('02', 'Why go') +
+                '<h2 style="max-width:18ch">What you can do at <em>Blastoff!</em></h2></div>' +
+              '<div class="pills" style="margin-top:clamp(34px,4.6vw,64px)">' + doings + '</div>' +
+            '</div>' +
             '<div style="margin-top:clamp(56px,8vw,104px)">' + figs + '</div>' +
           '</section>' +
         '</div>' +
@@ -1062,6 +1080,7 @@
       this._rail(root);
       this._marquees(root);
       this._faqs(root);
+      this._fitPills(root);
       this._countdown(root);
       this._calendar(root);
       this._share(root);
@@ -1076,6 +1095,7 @@
       if (this._stars) this._stars();
       if (this._progStop) this._progStop();
       if (this._revealGuard) clearTimeout(this._revealGuard);
+      if (this._pillFit) this._pillFit();
       document.documentElement.style.overflow = '';
     }
 
@@ -1335,6 +1355,55 @@
           onClone: (node) => this._logos(node),
         }));
       });
+    }
+
+    /* Make the staircase span the full column without wrapping any capsule.
+     *
+     * A fixed percentage step cannot do both. Tuned by hand, 8.31% was the
+     * exact value where the longest line filled the remaining width — one more
+     * word of copy and it wrapped, a shorter line and the row stopped short of
+     * the margin. So measure instead: find the widest capsule at its natural
+     * width, then divide the leftover space evenly across the steps. The last
+     * capsule lands flush with the right margin whatever the copy says.
+     *
+     * Measured after fonts settle, because the fallback face is a different
+     * width and would give the wrong answer.
+     */
+    _fitPills(root) {
+      const list = root.querySelector('.pills');
+      if (!list) return;
+      const pills = [...list.querySelectorAll('.pill')];
+      if (pills.length < 2) return;
+
+      const naturalWidth = (p) => {
+        const w = p.style.width, m = p.style.maxWidth;
+        p.style.maxWidth = 'none';
+        p.style.width = 'max-content';
+        const r = p.getBoundingClientRect().width;
+        p.style.width = w;
+        p.style.maxWidth = m;
+        return r;
+      };
+
+      const fit = () => {
+        // Below the breakpoint the capsules go full width and the step is 0.
+        if (matchMedia('(max-width:760px)').matches) {
+          list.style.removeProperty('--step');
+          return;
+        }
+        const col = list.clientWidth;
+        if (!col) return;
+        const widest = pills.reduce((m, p) => Math.max(m, naturalWidth(p)), 0);
+        const step = Math.max(0, (col - widest - 2) / (pills.length - 1));
+        list.style.setProperty('--step', step.toFixed(2) + 'px');
+      };
+
+      fit();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+      // Window resize only — observing the list itself would loop, since the
+      // step it sets changes the wrapping and therefore the list's height.
+      window.addEventListener('resize', fit);
+      this._pillFit = () => window.removeEventListener('resize', fit);
     }
 
     _faqs(root) {
