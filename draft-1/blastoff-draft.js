@@ -300,11 +300,6 @@
   a{color:inherit;}
   :where(a,button):focus-visible{outline:3px solid var(--yellow);outline-offset:3px;}
 
-  .skip{position:absolute;top:0;left:0;z-index:60;transform:translateY(-130%);
-    background:var(--yellow);color:#000;padding:14px 20px;font-family:var(--ui);
-    font-weight:700;text-decoration:none;transition:transform .18s ease;}
-  .skip:focus{transform:none;}
-
   /* ---- cosmos ---- */
   .sky{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
   .stars{position:absolute;inset:0;display:block;width:100%;height:100%;}
@@ -845,7 +840,6 @@
     const eyebrow = (n, label) => '<p class="eyebrow"><b>' + n + '</b> ' + esc(label) + '</p>';
 
     return '' +
-    '<a class="skip" href="#main">Skip to content</a>' +
     '<div class="progress" aria-hidden="true"><i></i></div>' +
 
     '<div class="sky" aria-hidden="true">' +
@@ -872,7 +866,7 @@
       '</nav>' +
       '<div class="scrim" id="scrim" aria-hidden="true"></div>' +
 
-      '<main id="main">' +
+      '<main id="main" tabindex="-1">' +
         '<header class="hero wrap" id="top">' +
           '<div class="mark">' +
             '<img src="' + esc(CONFIG.heroImage) + '" alt="Blastoff! 2026" width="1368" height="300">' +
