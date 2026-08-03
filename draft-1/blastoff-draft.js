@@ -400,12 +400,13 @@
 
   .hero-cta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;
     margin:clamp(22px,2.8vw,34px) 0 0;}
-  .micro{margin:clamp(16px,2vw,24px) 0 0;font-family:var(--ui);font-size:13px;
+  .substrip{text-align:center;padding-block:clamp(4px,1vw,10px) clamp(2px,.6vw,6px);}
+  .micro{margin:clamp(12px,1.6vw,18px) 0 0;font-family:var(--ui);font-size:13px;
     letter-spacing:.03em;color:var(--meta);}
 
   /* Countdown demoted to one quiet line — it was co-dominating the fold. */
   .count{display:flex;justify-content:center;align-items:baseline;flex-wrap:wrap;
-    gap:0 clamp(10px,1.4vw,18px);margin:clamp(24px,3.2vw,40px) 0 0;
+    gap:0 clamp(10px,1.4vw,18px);margin:0;
     font-variant-numeric:tabular-nums;font-family:var(--ui);}
   .count .u{display:inline-flex;align-items:baseline;gap:5px;}
   .count b{font-size:clamp(15px,1.7vw,19px);font-weight:700;letter-spacing:-.01em;
@@ -459,8 +460,6 @@
     font-size:clamp(13px,1.3vw,16px);letter-spacing:.05em;color:var(--bright);
     margin-bottom:7px;}
   .fig span{font-size:clamp(14px,1.5vw,17px);line-height:1.55;}
-  .note{margin:clamp(16px,2vw,24px) 0 0;font-family:var(--ui);font-size:12px;
-    letter-spacing:.02em;color:var(--meta);}
 
   /* ---- what you can do ---- */
   .pills{--step:clamp(16px,4.4vw,74px);display:flex;flex-direction:column;
@@ -772,9 +771,12 @@
       ['FAQs', '#faqs'],
     ].map(([l, h]) => '<li><a href="' + h + '">' + l + '</a></li>').join('');
 
-    const ticketBtn = (cls, label) =>
+    // One label everywhere. Four variants across nav, hero, closing and dock
+    // read as four different offers rather than one repeated call to action.
+    const TICKET_LABEL = 'Reserve your free ticket';
+    const ticketBtn = (cls) =>
       '<a class="btn ' + cls + '" href="' + esc(CONFIG.ticketsUrl) + '" ' +
-      'target="_blank" rel="noopener">' + label + '</a>';
+      'target="_blank" rel="noopener">' + TICKET_LABEL + '</a>';
 
     const factsLine =
       '<p class="facts-line">' +
@@ -839,9 +841,9 @@
             'stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>' +
         '</button>' +
         '<ul class="nav-list" id="nav-list">' + navItems +
-          '<li class="drawer-cta">' + ticketBtn('btn-solid', 'Reserve my free ticket') + '</li>' +
+          '<li class="drawer-cta">' + ticketBtn('btn-solid') + '</li>' +
         '</ul>' +
-        '<span class="nav-cta-desktop">' + ticketBtn('btn-solid', 'Reserve my free ticket') + '</span>' +
+        '<span class="nav-cta-desktop">' + ticketBtn('btn-solid') + '</span>' +
       '</nav>' +
       '<div class="scrim" id="scrim" aria-hidden="true"></div>' +
 
@@ -857,12 +859,19 @@
           '<p class="pitch">' + esc(EVENT.pitch) + '</p>' +
           factsLine +
           '<div class="hero-cta">' +
-            ticketBtn('btn-solid', 'Reserve my free ticket') +
+            ticketBtn('btn-solid') +
             '<a class="btn btn-outline" href="#employers">See participating employers</a>' +
           '</div>' +
-          '<p class="micro">400+ students expected · 30+ organisations · 40 society partners</p>' +
-          '<div class="count" id="count" aria-label="Time until Blastoff! 2026"></div>' +
         '</header>' +
+
+        /* Countdown and credibility figures sit just below the hero. Inside it
+           they made nine stacked elements and pushed the CTA away from being
+           the last thing read. */
+        '<div class="wrap substrip">' +
+          '<div class="count" id="count" aria-label="Time until Blastoff! 2026"></div>' +
+          '<p class="micro">400+ students expected · 30+ organisations · ' +
+            '40 society partners</p>' +
+        '</div>' +
 
         '<div class="ticker marquee" data-dir="1" data-speed="30" aria-hidden="true">' +
           '<div class="marquee-track"><div class="marquee-set">' + tickerSet + '</div></div>' +
@@ -889,10 +898,7 @@
             eyebrow('02', 'Why go') +
             '<h2 style="max-width:18ch">What you can do at <em>Blastoff!</em></h2>' +
             '<div class="pills" style="margin-top:clamp(34px,4.6vw,64px)">' + doings + '</div>' +
-            '<div style="margin-top:clamp(56px,8vw,104px)">' + figs +
-              '<p class="note">TODO — confirm whether these are 2025 figures or ' +
-                '2026 projections before publishing.</p>' +
-            '</div>' +
+            '<div style="margin-top:clamp(56px,8vw,104px)">' + figs + '</div>' +
           '</section>' +
         '</div>' +
 
@@ -961,7 +967,7 @@
               'professional community — all in one afternoon.</p>' +
             factsLine +
             '<div class="hero-cta">' +
-              ticketBtn('btn-solid', 'Reserve your free place') +
+              ticketBtn('btn-solid') +
               '<button class="btn btn-outline" id="share" type="button">' +
                 SHARE_ICON + '<span>Share</span></button>' +
             '</div>' +
@@ -981,7 +987,8 @@
         '</div>' +
         '<div class="foot-cols">' +
           '<div><h3>Event</h3><ul>' +
-            '<li><a href="' + esc(CONFIG.ticketsUrl) + '" target="_blank" rel="noopener">Reserve a ticket</a></li>' +
+            '<li><a href="' + esc(CONFIG.ticketsUrl) + '" target="_blank" rel="noopener">' +
+              TICKET_LABEL + '</a></li>' +
             '<li><a href="#employers">Employers</a></li>' +
             '<li><a href="#faqs">FAQs</a></li>' +
             '<li><a href="' + esc(TRAVEL.mapUrl) + '" target="_blank" rel="noopener">Getting there</a></li>' +
@@ -1004,7 +1011,7 @@
       '<p><b>' + esc(EVENT.dateLabel) + '</b> · ' + esc(EVENT.timeLabel) + ' · Suntec · free</p>' +
       '<span class="grp">' +
         '<button class="top" id="to-top" type="button" aria-label="Back to top">↑</button>' +
-        ticketBtn('btn-solid', 'Reserve free ticket') +
+        ticketBtn('btn-solid') +
       '</span>' +
     '</div>';
   }
