@@ -29,7 +29,10 @@
     // Relative to this script, so they work at any served subpath. Blank — or
     // a URL that 404s — falls back to live text rather than a broken image.
     heroImage: './assets/blastoff-wordmark.png',  // 1368x300
-    taglineImage: './assets/tagline.svg',         // 345x20
+    // Blank on purpose: assets/tagline.svg is outlined artwork reading "to new
+    // heights: bigger, better, bolder!", which the poster superseded. Live text
+    // is used instead. Re-point this only at artwork of the current tagline.
+    taglineImage: '',
     crestImage: './assets/ukssc-crest.png',       // 91x84
 
     // Where sponsor logos are looked up: <logoBase><slug>.png
@@ -56,9 +59,10 @@
 
   // Split into explicit lines so the time never orphans onto its own row.
   const EVENT = {
-    when: ['14 August 2026', '13:00 – 18:00'],
-    where: ['Suntec Convention Centre', 'Level 3'],
-    tagline: 'to new heights: bigger, better, bolder!',
+    // Per the publicity poster, which is what has gone out publicly.
+    when: ['14 August 2026', '4pm – 9pm'],
+    where: ['Suntec Singapore Convention', '& Exhibition Centre', 'Level 3, Summit 1'],
+    tagline: 'to new horizons!',
   };
 
   const ABOUT = `Launched in 2021 (originally as the "Through the Generations" career fair), ` +
@@ -69,7 +73,7 @@
     `career journeys.`;
 
   const STATS = [
-    { figure: '600+', copy: 'attendees from across the world to grow your network' },
+    { figure: '400+', copy: 'attendees from across the world to grow your network' },
     { figure: '30',   copy: 'prestigious partners offering exclusive opportunities' },
     { figure: '40',   copy: 'society partners dedicated to advancing overseas Singaporean talent' },
   ];
