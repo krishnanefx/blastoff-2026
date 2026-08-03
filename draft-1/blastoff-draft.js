@@ -414,19 +414,48 @@
     color:var(--bright);margin-bottom:8px;}
   .fig span{font-size:clamp(14px,1.5vw,17px);line-height:1.5;}
 
-  /* ---- benefit pills: the poster's own language, kept ---- */
-  .pills{display:flex;flex-direction:column;gap:clamp(11px,1.5vw,17px);}
-  .pill{align-self:center;padding:clamp(12px,1.5vw,18px) clamp(24px,3.4vw,46px);
-    border:1px solid var(--hair);border-radius:999px;
-    font-size:clamp(15px,1.9vw,23px);letter-spacing:-.01em;color:var(--bright);}
-  @media (min-width:760px){
-    .pill:nth-child(1){align-self:center;transform:translateX(7%);}
-    .pill:nth-child(2){align-self:flex-start;margin-left:5%;}
-    .pill:nth-child(3){align-self:flex-start;margin-left:2%;}
-    .pill:nth-child(4){align-self:center;transform:translateX(-5%);}
+  /* ---- benefit pills ----
+     The poster's capsule language, but composed rather than scattered. Each
+     step indents one unit further right so the stagger reads as a sequence
+     instead of noise; the numerals give it a spine; the closing line kicks
+     back up and to the right, which is the whole point of the event. */
+  .pills{--step:clamp(18px,3.4vw,64px);display:flex;flex-direction:column;
+    gap:clamp(10px,1.2vw,15px);align-items:flex-start;}
+  .pill-lead{margin:0 0 clamp(20px,2.6vw,32px);font-family:var(--ui);font-size:11px;
+    letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.34);}
+  .pill{
+    display:flex;align-items:baseline;
+    margin-left:calc(var(--i) * var(--step));
+    padding:clamp(13px,1.5vw,18px) clamp(26px,2.6vw,38px);
+    border:1px solid rgba(255,255,255,.26);border-radius:999px;
+    background:rgba(255,255,255,.022);
+    font-size:clamp(15px,1.9vw,23px);letter-spacing:-.015em;color:var(--bright);
+    transition:background .22s ease,color .22s ease,border-color .22s ease;
   }
-  .pills .more{align-self:flex-end;padding-right:3%;color:var(--yellow);
-    font-size:clamp(15px,1.9vw,23px);}
+  .pill i{flex:0 0 auto;font-style:normal;font-family:var(--ui);font-weight:700;
+    font-size:11px;letter-spacing:.14em;color:var(--yellow);
+    padding-right:clamp(14px,1.4vw,18px);margin-right:clamp(14px,1.4vw,18px);
+    border-right:1px solid rgba(255,255,255,.18);
+    transition:color .22s ease,border-color .22s ease;}
+  .pill:hover{background:var(--yellow);color:#07080C;border-color:var(--yellow);}
+  .pill:hover i{color:rgba(7,8,12,.5);border-right-color:rgba(7,8,12,.22);}
+
+  .pills .more{display:flex;align-items:center;gap:12px;
+    margin-left:calc((var(--i) + .35) * var(--step));
+    margin-top:clamp(10px,1.4vw,20px);
+    font-size:clamp(15px,1.9vw,23px);letter-spacing:-.015em;color:var(--yellow);}
+  .pills .more::after{content:"";width:clamp(34px,5vw,74px);height:1px;
+    background:linear-gradient(90deg,var(--yellow),transparent);}
+
+  /* Walk the reveal down the sequence rather than firing all five at once. */
+  :host(.reveal-on) .pill.is-in,
+  :host(.reveal-on) .more.is-in{animation-delay:calc(var(--i) * 80ms);}
+
+  @media (max-width:760px){
+    .pills{align-items:stretch;}
+    .pill,.pills .more{margin-left:0;}
+    .pills .more{justify-content:flex-end;}
+  }
 
   /* ---- gallery ---- */
   .rail-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
@@ -662,8 +691,11 @@
       ['FAQs', '#faqs'],
     ].map(([l, h]) => '<li><a href="' + h + '">' + l + '</a></li>').join('');
 
-    const pills = BENEFITS.map((b) => '<div class="pill rise">' + esc(b) + '</div>').join('') +
-      '<div class="more rise">…and more!</div>';
+    const pills = BENEFITS.map((b, i) =>
+      '<div class="pill rise" style="--i:' + i + '">' +
+        '<i>' + String(i + 1).padStart(2, '0') + '</i><span>' + esc(b) + '</span>' +
+      '</div>').join('') +
+      '<div class="more rise" style="--i:' + BENEFITS.length + '">…and more!</div>';
 
     // Kinetic strip. One set, cloned by loopTrack until it covers the viewport.
     const tickerSet = [
@@ -768,7 +800,10 @@
           '<section class="sec" id="why">' +
             eyebrow('02', 'Why go') +
             '<div class="figs">' + figs + '</div>' +
-            '<div class="pills" style="margin-top:clamp(48px,7vw,96px)">' + pills + '</div>' +
+            '<div style="margin-top:clamp(52px,7vw,104px)">' +
+              '<p class="pill-lead">On the day</p>' +
+              '<div class="pills">' + pills + '</div>' +
+            '</div>' +
           '</section>' +
         '</div>' +
 
