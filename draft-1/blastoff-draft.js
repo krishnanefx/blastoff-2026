@@ -381,7 +381,7 @@
 
   /* ---- sections ---- */
   section{scroll-margin-top:90px;}
-  .sec{padding-block:clamp(64px,11vw,150px);}
+  .sec{padding-block:clamp(58px,8.5vw,124px);}
   .sec + .sec{border-top:1px solid var(--hair);}
   .eyebrow{display:flex;align-items:center;gap:14px;margin:0 0 clamp(18px,2.4vw,30px);
     font-family:var(--ui);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
@@ -419,8 +419,8 @@
      step indents one unit further right so the stagger reads as a sequence
      instead of noise; the numerals give it a spine; the closing line kicks
      back up and to the right, which is the whole point of the event. */
-  .pills{--step:clamp(18px,3.4vw,64px);display:flex;flex-direction:column;
-    gap:clamp(10px,1.2vw,15px);align-items:flex-start;}
+  .pills{--step:clamp(20px,6.4vw,108px);display:flex;flex-direction:column;
+    gap:clamp(10px,1.2vw,16px);align-items:flex-start;}
   .pill-lead{margin:0 0 clamp(20px,2.6vw,32px);font-family:var(--ui);font-size:11px;
     letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.34);}
   .pill{
@@ -429,7 +429,7 @@
     padding:clamp(13px,1.5vw,18px) clamp(26px,2.6vw,38px);
     border:1px solid rgba(255,255,255,.26);border-radius:999px;
     background:rgba(255,255,255,.022);
-    font-size:clamp(15px,1.9vw,23px);letter-spacing:-.015em;color:var(--bright);
+    font-size:clamp(15px,2vw,26px);letter-spacing:-.02em;color:var(--bright);
     transition:background .22s ease,color .22s ease,border-color .22s ease;
   }
   .pill i{flex:0 0 auto;font-style:normal;font-family:var(--ui);font-weight:700;
@@ -442,8 +442,8 @@
 
   .pills .more{display:flex;align-items:center;gap:12px;
     margin-left:calc((var(--i) + .35) * var(--step));
-    margin-top:clamp(10px,1.4vw,20px);
-    font-size:clamp(15px,1.9vw,23px);letter-spacing:-.015em;color:var(--yellow);}
+    margin-top:clamp(12px,1.6vw,24px);
+    font-size:clamp(15px,2vw,26px);letter-spacing:-.02em;color:var(--yellow);}
   .pills .more::after{content:"";width:clamp(34px,5vw,74px);height:1px;
     background:linear-gradient(90deg,var(--yellow),transparent);}
 
