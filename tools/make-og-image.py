@@ -19,7 +19,7 @@ MINT = (173, 248, 245)
 STRIPES = [(255, 173, 0), (20, 20, 20), (247, 247, 244), (105, 5, 4)]
 
 FONT = sys.argv[1] if len(sys.argv) > 1 else None
-OUT = 'assets/og-blastoff-2026.png'
+OUT = 'assets/og-blastoff-2026-v2.png'
 
 
 def load(size):
@@ -53,9 +53,9 @@ mh = round(mw * mark.height / mark.width)
 mark = mark.resize((mw, mh), Image.LANCZOS)
 card.paste(mark, ((W - mw) // 2, 140), mark)
 
-centre(draw, '14 AUGUST 2026  ·  SUNTEC CONVENTION CENTRE', load(38), 372, YELLOW)
-centre(draw, 'The UKSSC careers fair for overseas Singaporean students', load(29), 442, MINT)
-centre(draw, 'Free admission', load(29), 492, YELLOW)
+centre(draw, 'to new horizons!', load(34), 366, MINT)
+centre(draw, '14 AUGUST 2026  ·  4PM–9PM', load(40), 420, YELLOW)
+centre(draw, 'Suntec Singapore Convention & Exhibition Centre  ·  Free admission', load(25), 484, MINT)
 
 # The footer's four-colour band, tying the card to the page.
 band = 18

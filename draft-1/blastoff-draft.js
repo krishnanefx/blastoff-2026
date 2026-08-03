@@ -31,6 +31,10 @@
     ticketsUrl: 'https://www.eventbrite.sg/e/blastoff-2026-to-new-horizons-tickets-1995329425023',
     heroImage: asset('../assets/blastoff-wordmark.png'),
     crestImage: asset('../assets/ukssc-crest.png'),
+    // Reverse (white) lockup, derived from SGN's own single-colour horizontal
+    // logo — they publish red only, and the poster uses white on dark. Worth
+    // asking SGN for their official reverse asset before this goes public.
+    sgnImage: asset('../assets/sgn-white.png'),
     logoBase: asset('../assets/logos/'),
     pageUrl: 'https://krishnanefx.github.io/blastoff-2026/draft-1/',
   };
@@ -45,6 +49,17 @@
     // Singapore is UTC+8 year round.
     startISO: '2026-08-14T16:00:00+08:00',
     endISO: '2026-08-14T21:00:00+08:00',
+  };
+
+  const STATS = [
+    { figure: '400+', label: 'global attendees', copy: 'students flying in from across the UK, Europe, the US and Asia' },
+    { figure: '30', label: 'corporate partners', copy: 'hiring across finance, consulting, tech, energy and the public service' },
+    { figure: '40', label: 'society partners', copy: 'student bodies advancing overseas Singaporean talent' },
+  ];
+
+  const TRAVEL = {
+    lines: ['Promenade', 'Esplanade', 'City Hall'],
+    mapUrl: 'https://maps.google.com/?q=Suntec+Singapore+Convention+%26+Exhibition+Centre',
   };
 
   const BENEFITS = [
@@ -276,7 +291,73 @@
   .guides i:nth-child(2){inset:44vh -8vw auto 22vw;height:46vh;}
   .guides i:nth-child(3){inset:92vh 12vw auto -6vw;height:40vh;}
 
+  /* Film grain. A flat dark page reads as a dead #0A0B10 rectangle; a little
+     noise gives the black some tooth and stops the gradients from banding. */
+  .grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.05;
+    mix-blend-mode:overlay;background-repeat:repeat;background-size:180px 180px;}
+
+  /* Cursor-tracked bloom — pure decoration, desktop pointers only. */
+  .glow{position:absolute;width:640px;height:640px;border-radius:50%;
+    pointer-events:none;z-index:0;opacity:0;transition:opacity .5s ease;
+    background:radial-gradient(circle,rgba(223,255,62,.10),transparent 62%);
+    transform:translate(-50%,-50%);}
+  .glow.is-on{opacity:1;}
+  @media (hover:none){ .glow{display:none;} }
+
+  /* Shooting star: one element reused, retargeted between runs. */
+  .shoot{position:absolute;z-index:0;pointer-events:none;height:1px;width:180px;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));
+    opacity:0;border-radius:99px;}
+  .shoot::after{content:"";position:absolute;right:0;top:-1px;width:3px;height:3px;
+    border-radius:50%;background:#fff;box-shadow:0 0 8px 2px rgba(255,255,255,.7);}
+
+  /* Reading progress, pinned above the nav. */
+  .progress{position:fixed;left:0;top:0;height:2px;width:100%;z-index:45;
+    background:transparent;pointer-events:none;}
+  .progress i{display:block;height:100%;width:0;
+    background:linear-gradient(90deg,var(--mint),var(--yellow));
+    box-shadow:0 0 12px rgba(223,255,62,.5);}
+
   .page{position:relative;z-index:1;}
+
+  /* ---- section eyebrows ---- */
+  .eyebrow{display:flex;align-items:center;gap:12px;margin:0 0 14px;
+    font-family:var(--ui);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(255,255,255,.4);}
+  .eyebrow b{color:var(--yellow);font-weight:700;}
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  /* Headings pick up a faint vertical fade so they sit in the space rather
+     than on top of it. */
+  h2{background:linear-gradient(180deg,#EAFFFE,#7FD8D4);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+
+  /* ---- stats ---- */
+  .stats{display:grid;gap:clamp(14px,1.8vw,20px);
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));}
+  .stat{position:relative;overflow:hidden;padding:clamp(24px,3vw,36px);
+    border:1px solid var(--line);border-radius:var(--r);
+    background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.012));}
+  .stat b{display:block;font-size:clamp(46px,7vw,86px);line-height:.94;
+    letter-spacing:-.05em;color:var(--yellow);font-variant-numeric:tabular-nums;}
+  .stat em{display:block;margin:10px 0 12px;font-style:normal;font-family:var(--ui);
+    font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;
+    color:rgba(255,255,255,.62);}
+  .stat span{font-size:clamp(14px,1.5vw,16px);line-height:1.5;}
+
+  /* ---- getting there ---- */
+  .travel{display:grid;gap:clamp(18px,2.4vw,30px);align-items:center;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    padding:clamp(24px,3vw,38px);border:1px solid var(--line);border-radius:var(--r);
+    background:linear-gradient(150deg,rgba(173,248,245,.06),rgba(255,255,255,.012));}
+  .travel h3{margin:0 0 8px;font-size:clamp(19px,2.2vw,25px);letter-spacing:-.03em;color:var(--mint);}
+  .travel p{margin:0;font-size:clamp(14px,1.5vw,16px);line-height:1.6;}
+  .mrt{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;list-style:none;padding:0;}
+  .mrt li{padding:7px 14px;border-radius:999px;border:1px solid var(--line);
+    background:rgba(255,255,255,.04);font-family:var(--ui);font-size:13px;
+    color:rgba(255,255,255,.82);}
+  .mrt li::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--mint);margin-right:8px;vertical-align:middle;}
 
   /* ---- nav ---- */
   .nav{
@@ -464,7 +545,7 @@
   .presented div{display:flex;align-items:center;gap:14px;}
   .presented small{font-family:var(--ui);font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.5);}
   .presented img{height:44px;width:auto;object-fit:contain;}
-  .sgn{font-family:var(--ui);font-weight:700;font-size:13px;line-height:1.25;color:rgba(255,255,255,.8);}
+  .presented img.sgn{height:52px;}
   .foot-cols{display:grid;gap:clamp(24px,4vw,48px);margin-top:clamp(28px,4vw,44px);
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
   .foot h3{margin:0 0 12px;font-family:var(--ui);font-weight:700;font-size:13px;
@@ -480,9 +561,18 @@
   .stripes i:nth-child(3){background:var(--bone);}
   .stripes i:nth-child(4){background:var(--maroon);}
 
-  /* ---- reveal on scroll (idea 7) ---- */
-  .rise{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
-  .rise.is-in{opacity:1;transform:none;}
+  /* ---- reveal on scroll (idea 7) ----
+     Fails OPEN. Content is visible by default and only hidden once JS has
+     confirmed it can drive the reveal, so a blocked IntersectionObserver, a
+     script error or a browser that never paints leaves the page readable
+     instead of blank. Never hide content with CSS that only JS can undo. */
+  .rise{opacity:1;}
+  :host(.reveal-on) .rise{opacity:0;}
+  :host(.reveal-on) .rise.is-in{animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards;}
+  @keyframes rise{
+    from{opacity:0;transform:translateY(18px);}
+    to{opacity:1;transform:none;}
+  }
 
   /* ---- responsive ---- */
   @media (max-width:760px){
@@ -613,6 +703,7 @@
     const nav = [
       ['About', '#about'],
       ['Why go', '#why'],
+      ['Getting there', '#getting-there'],
       ['Sponsors', '#sponsors'],
       ['FAQs', '#faqs'],
     ].map(([l, h]) => '<li><a href="' + h + '">' + l + '</a></li>').join('');
@@ -633,13 +724,23 @@
         '<div class="faq-a" id="a' + i + '" role="region"><div><p>' + esc(f.a) + '</p></div></div>' +
       '</div>').join('');
 
+    const stats = STATS.map((s) =>
+      '<div class="stat rise"><b>' + esc(s.figure) + '</b><em>' + esc(s.label) + '</em>' +
+      '<span>' + esc(s.copy) + '</span></div>').join('');
+
+    const eyebrow = (n, label) =>
+      '<p class="eyebrow"><b>' + n + '</b> ' + esc(label) + '</p>';
+
     return '' +
     '<a class="skip" href="#main">Skip to content</a>' +
+    '<div class="progress" aria-hidden="true"><i></i></div>' +
 
     '<div class="sky" aria-hidden="true">' +
       '<canvas class="stars"></canvas>' +
       '<div class="bloom a"></div><div class="bloom b"></div><div class="bloom c"></div>' +
+      '<div class="glow"></div><div class="shoot"></div>' +
     '</div>' +
+    '<div class="grain" aria-hidden="true"></div>' +
     '<div class="guides" aria-hidden="true"><i></i><i></i><i></i></div>' +
 
     '<div class="page">' +
@@ -693,14 +794,42 @@
           '<p class="free">Admission is free — but Suntec has a capacity, so register ahead.</p>' +
 
           '<section class="sec" id="about">' +
+            eyebrow('01', 'About') +
             '<h2>What is Blastoff!?</h2>' +
             '<p class="lede rise">' + esc(ABOUT) + '</p>' +
+          '</section>' +
+
+          '<section class="sec" id="why">' +
+            eyebrow('02', 'Why go') +
+            '<h2>The room you want to be in</h2>' +
+            '<div class="stats">' + stats + '</div>' +
+          '</section>' +
+
+          '<section class="sec" id="getting-there">' +
+            eyebrow('03', 'Getting there') +
+            '<div class="travel rise">' +
+              '<div>' +
+                '<h3>Suntec Singapore</h3>' +
+                '<p>Convention &amp; Exhibition Centre<br>' +
+                  esc(EVENT.venueDetail) + '<br>1 Raffles Boulevard</p>' +
+              '</div>' +
+              '<div>' +
+                '<p>A short covered walk from three MRT stations:</p>' +
+                '<ul class="mrt">' +
+                  TRAVEL.lines.map((l) => '<li>' + esc(l) + '</li>').join('') +
+                '</ul>' +
+                '<p style="margin-top:16px"><a href="' + esc(TRAVEL.mapUrl) + '" ' +
+                  'target="_blank" rel="noopener" style="color:var(--yellow)">' +
+                  'Open in Maps →</a></p>' +
+              '</div>' +
+            '</div>' +
           '</section>' +
         '</div>' +
 
         '<section class="sec" aria-label="Photos from previous editions">' +
           '<div class="wrap rail-head">' +
-            '<h2 style="margin:0">Previous editions</h2>' +
+            '<div>' + eyebrow('04', 'Gallery') +
+              '<h2 style="margin:0">Previous editions</h2></div>' +
             '<div class="rail-btns">' +
               '<button class="rbtn" type="button" data-dir="-1" aria-label="Previous photos">' +
                 '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" ' +
@@ -716,12 +845,13 @@
         '</section>' +
 
         '<section class="sec" id="sponsors">' +
-          '<div class="wrap"><h2>Sponsors &amp; partners</h2></div>' +
+          '<div class="wrap">' + eyebrow('05', 'Partners') +
+            '<h2>Sponsors &amp; partners</h2></div>' +
           '<div class="wrap"><div class="band">' + sponsors + '</div></div>' +
         '</section>' +
 
         '<section class="sec wrap" id="faqs">' +
-          '<h2>FAQs</h2>' + faqs +
+          eyebrow('06', 'Questions') + '<h2>FAQs</h2>' + faqs +
         '</section>' +
       '</main>' +
 
@@ -730,7 +860,7 @@
           '<div><small>proudly presented by</small>' +
             '<img src="' + esc(CONFIG.crestImage) + '" alt="UKSSC"></div>' +
           '<div><small>community partner</small>' +
-            '<span class="sgn">Singapore<br>Global Network</span></div>' +
+            '<img class="sgn" src="' + esc(CONFIG.sgnImage) + '" alt="Singapore Global Network"></div>' +
         '</div>' +
         '<div class="foot-cols">' +
           '<div><h3>Event</h3><ul>' +
@@ -778,6 +908,10 @@
       root.append(document.createRange().createContextualFragment(template()));
 
       this._starfield(root);
+      this._grain(root);
+      this._glow(root);
+      this._shootingStars(root);
+      this._progress(root);
       this._nav(root);
       this._logos(root);
       this._rail(root);
@@ -795,6 +929,9 @@
       this._loops = [];
       if (this._tick) clearInterval(this._tick);
       if (this._stars) this._stars();
+      if (this._shootStop) this._shootStop();
+      if (this._progStop) this._progStop();
+      if (this._revealGuard) clearTimeout(this._revealGuard);
     }
 
     /* Idea 8: the poster's star ground, drawn rather than shipped as an image.
@@ -863,6 +1000,98 @@
       };
     }
 
+    /* Grain generated once into a tiny tiling data URI. A 180px PNG tile is a
+     * few KB and repeats, versus shipping a full-viewport noise image. */
+    _grain(root) {
+      const el = root.querySelector('.grain');
+      if (!el) return;
+      const n = 180;
+      const c = document.createElement('canvas');
+      c.width = c.height = n;
+      const ctx = c.getContext('2d');
+      const img = ctx.createImageData(n, n);
+      // Deterministic value noise: no Math.random, so the tile is identical
+      // every load and cannot shimmer between renders.
+      for (let i = 0; i < img.data.length; i += 4) {
+        const p = i / 4;
+        const v = (((p * 1103515245 + 12345) >>> 8) % 256);
+        img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+        img.data[i + 3] = 26;
+      }
+      ctx.putImageData(img, 0, 0);
+      el.style.backgroundImage = 'url(' + c.toDataURL('image/png') + ')';
+    }
+
+    _glow(root) {
+      const glow = root.querySelector('.glow');
+      if (!glow || matchMedia('(hover:none)').matches || reduced()) return;
+      let raf = 0, x = 0, y = 0;
+      const move = () => {
+        raf = 0;
+        glow.style.left = x + 'px';
+        glow.style.top = y + 'px';
+      };
+      this.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        const box = this.getBoundingClientRect();
+        x = e.clientX - box.left;
+        y = e.clientY - box.top;
+        glow.classList.add('is-on');
+        if (!raf) raf = requestAnimationFrame(move);
+      });
+      this.addEventListener('pointerleave', () => glow.classList.remove('is-on'));
+    }
+
+    /* One reused element, retargeted each run — cheaper than spawning nodes,
+     * and it keeps at most one streak on screen so it stays a grace note. */
+    _shootingStars(root) {
+      const star = root.querySelector('.shoot');
+      if (!star || reduced()) return;
+      let timer = 0;
+
+      const run = () => {
+        const w = this.clientWidth;
+        const startX = w * (0.15 + 0.6 * ((Date.now() % 997) / 997));
+        const startY = 80 + ((Date.now() % 613) / 613) * 420 + (window.scrollY || 0);
+        star.style.left = startX + 'px';
+        star.style.top = startY + 'px';
+        star.style.transition = 'none';
+        star.style.transform = 'rotate(28deg) translate3d(0,0,0)';
+        star.style.opacity = '0';
+        // Next frame, so the reset above is not animated.
+        requestAnimationFrame(() => {
+          star.style.transition = 'transform 1.1s cubic-bezier(.3,.7,.4,1), opacity 1.1s ease';
+          star.style.transform = 'rotate(28deg) translate3d(360px,0,0)';
+          star.style.opacity = '1';
+          setTimeout(() => { star.style.opacity = '0'; }, 620);
+        });
+        timer = setTimeout(run, 7000 + (Date.now() % 5000));
+      };
+
+      timer = setTimeout(run, 2600);
+      this._shootStop = () => clearTimeout(timer);
+    }
+
+    _progress(root) {
+      const bar = root.querySelector('.progress i');
+      if (!bar) return;
+      let raf = 0;
+      const paint = () => {
+        raf = 0;
+        const max = document.scrollingElement.scrollHeight - innerHeight;
+        const pct = max > 0 ? Math.min(1, (window.scrollY || 0) / max) : 0;
+        bar.style.width = (pct * 100).toFixed(2) + '%';
+      };
+      const onScroll = () => { if (!raf) raf = requestAnimationFrame(paint); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      paint();
+      this._progStop = () => {
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+      };
+    }
+
     _nav(root) {
       const nav = root.querySelector('.nav');
       const toggle = root.querySelector('.nav-toggle');
@@ -893,7 +1122,7 @@
           if (active) active.setAttribute('aria-current', 'true');
         });
       }, { rootMargin: '-45% 0px -50% 0px' });
-      ['about', 'why', 'sponsors', 'faqs'].forEach((id) => {
+      ['about', 'why', 'getting-there', 'sponsors', 'faqs'].forEach((id) => {
         const el = root.getElementById(id);
         if (el) io.observe(el);
       });
@@ -1067,16 +1296,27 @@
     }
 
     _reveal(root) {
-      const items = root.querySelectorAll('.rise');
-      if (reduced()) { items.forEach((el) => el.classList.add('is-in')); return; }
+      const items = [...root.querySelectorAll('.rise')];
+      // Leave everything visible if we cannot animate it properly.
+      if (reduced() || typeof IntersectionObserver !== 'function') return;
+
+      this.classList.add('reveal-on');
+      let any = false;
       const io = new IntersectionObserver((entries) => {
         entries.forEach((en) => {
           if (!en.isIntersecting) return;
+          any = true;
           en.target.classList.add('is-in');
           io.unobserve(en.target);
         });
       }, { rootMargin: '0px 0px -12% 0px' });
       items.forEach((el) => io.observe(el));
+
+      // If the observer never delivers — throttled tab, blocked API — show
+      // everything rather than sit on an invisible page.
+      this._revealGuard = setTimeout(() => {
+        if (!any) items.forEach((el) => el.classList.add('is-in'));
+      }, 1800);
     }
   }
 
