@@ -300,9 +300,10 @@
   a{color:inherit;}
   :where(a,button):focus-visible{outline:3px solid var(--yellow);outline-offset:3px;}
 
-  .skip{position:absolute;left:-9999px;top:0;z-index:60;background:var(--yellow);color:#000;
-    padding:14px 20px;font-family:var(--ui);font-weight:700;text-decoration:none;}
-  .skip:focus{left:0;}
+  .skip{position:absolute;top:0;left:0;z-index:60;transform:translateY(-130%);
+    background:var(--yellow);color:#000;padding:14px 20px;font-family:var(--ui);
+    font-weight:700;text-decoration:none;transition:transform .18s ease;}
+  .skip:focus{transform:none;}
 
   /* ---- cosmos ---- */
   .sky{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
@@ -587,8 +588,10 @@
     font-family:var(--ui);
     font-size:15px;color:var(--text);text-decoration:none;transition:color .2s ease;}
   .foot li a:hover{color:var(--yellow);}
+  /* 30% white on near-black measured ~2.4:1 and failed contrast. 62% clears
+     4.5:1, which 11px text needs. */
   .copy{margin:clamp(28px,3.6vw,46px) 0 0;font-family:var(--ui);font-size:11px;
-    letter-spacing:.03em;color:rgba(255,255,255,.3);}
+    letter-spacing:.03em;color:rgba(255,255,255,.62);}
 
   /* ---- sticky dock ---- */
   .dock{position:fixed;left:0;right:0;bottom:0;z-index:38;transform:translateY(110%);
@@ -645,6 +648,28 @@
   }
   `;
 
+  /* Take a duplicated track out of the accessibility tree AND the tab order.
+   *
+   * aria-hidden on the wrapper is enough today because nothing inside a slide
+   * is focusable, and it does inherit to descendants. But it is fragile: the
+   * moment a caption gains a link or a photo becomes clickable, focusable
+   * nodes would sit inside an aria-hidden subtree — an axe violation and a
+   * real keyboard trap, since a screen reader user would tab to something it
+   * cannot announce. `inert` closes both holes at once.
+   *
+   * The attribute is also stamped on descendant figures and images so that
+   * inspecting any single node in devtools shows it is a duplicate, rather
+   * than having to walk up to the wrapper to find out.
+   */
+  function hideDuplicate(node) {
+    node.setAttribute('aria-hidden', 'true');
+    node.inert = true;
+    node.setAttribute('data-clone', '');
+    node.querySelectorAll('figure,img,figcaption').forEach((el) => {
+      el.setAttribute('aria-hidden', 'true');
+    });
+  }
+
   /* ------------------------------------------------- looping track engine */
 
   function loopTrack(viewport, track, { autoplay = 0, onClone = () => {} } = {}) {
@@ -662,7 +687,7 @@
       const need = Math.max(2, Math.ceil(viewport.clientWidth / half) + 1);
       while (track.children.length < need) {
         const clone = track.firstElementChild.cloneNode(true);
-        clone.setAttribute('aria-hidden', 'true');
+        hideDuplicate(clone);
         track.appendChild(clone);
         onClone(clone);
       }
@@ -1033,6 +1058,7 @@
       root.append(style);
       root.append(document.createRange().createContextualFragment(template()));
 
+      this._hardenClones(root);
       this._starfield(root);
       this._grain(root);
       this._glow(root);
@@ -1057,6 +1083,14 @@
       if (this._progStop) this._progStop();
       if (this._revealGuard) clearTimeout(this._revealGuard);
       document.documentElement.style.overflow = '';
+    }
+
+    // The second track in each carousel ships in the markup with aria-hidden.
+    // Give it the same treatment loopTrack gives the ones it generates, so
+    // hand-written and runtime duplicates behave identically.
+    _hardenClones(root) {
+      root.querySelectorAll('.rail-set[aria-hidden="true"],.marquee-set[aria-hidden="true"]')
+        .forEach(hideDuplicate);
     }
 
     /* An animated starfield, drawn rather than shipped as an image.
