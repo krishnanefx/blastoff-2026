@@ -1,55 +1,33 @@
-# Blastoff! 2026 — Wix Custom Element
+# BlastOFF! 2026
 
-A single self-contained Web Component built from the Figma frame. Everything —
-markup, styles, fonts, carousel, accordion — lives in `blastoff-element.js`.
+The UKSSC's career fair site. One self-contained Web Component — markup, styles,
+fonts, carousels, accordion — in `blastoff-element.js`, mounted by `index.html`.
 
 ```
-blastoff-element.js            ← the deliverable. The only file Wix needs.
-index.html                     ← local preview harness. Not used by Wix.
-Asset 6ukssc blastoff 1 1.png  ← hero wordmark, 1368x300
-to new heights_....svg         ← tagline, 345x20
-assets/ukssc-crest.png         ← crest, extracted from Footer.svg
-assets/logos/                  ← sponsor logos, named <slug>.png
-Footer.png / Footer.svg        ← design reference, not used at runtime
-UKSSC Website Refresh.fig      ← Figma source, untouched
+blastoff-element.js   ← the whole site. Tag name: <ukssc-blastoff>
+index.html            ← the page that mounts it
+assets/               ← wordmark, crest, partner logos, photos, fonts, share card
+tools/                ← build scripts for the logos and the share card
 ```
+
+Ships to **blastoff2026.com**. This repo also publishes to
+`krishnanefx.github.io/blastoff-2026/`, which is a staging mirror — `index.html`
+carries `noindex` for that reason, and a `canonical` pointing at the real domain.
+Delete the `noindex` line at launch; it is commented as such in the file.
+
+The previous Wix custom-element build is preserved two ways: tagged
+`v1-wix-element` in git, and zipped outside the repo as
+`ukssc-blastoff-site-v1-20260803.zip`.
 
 ## Preview locally
 
+Any static server from the repo root, e.g.:
+
 ```bash
-node /private/tmp/claude-501/-Users-krishnanadaikkappan-Downloads-UKSSC-BLASTOFF-2026/899802c6-9d07-4492-bcab-9a5a1f043a93/scratchpad/server.js
+python3 -m http.server 4321
 ```
 
 Then open <http://localhost:4321>.
-
-## Install in Wix
-
-Velo page code can only drive elements you have already placed in the Editor —
-it cannot inject a layout. So this ships as a **Custom Element**, which Wix
-renders natively in the page (unlike the HTML embed, which is a fixed-height
-iframe that will not resize with your content).
-
-1. Turn on **Dev Mode** in the Wix Editor.
-2. Under **Public & Backend**, upload `blastoff-element.js` to the `public` folder.
-3. **Add → Embed & Social → Custom Element**.
-4. Set **Choose file** to the uploaded script and **Tag name** to `ukssc-blastoff`.
-5. Stretch the element to full width, height set to *fit content*.
-
-### Attributes
-
-Images use relative paths so the local preview works as shipped. In Wix, upload
-each asset to Media and override the path from the Editor — no code edit:
-
-| Attribute       | Default                    |
-| --------------- | -------------------------- |
-| `tickets-url`   | the Eventbrite listing     |
-| `hero-image`    | the 1368x300 wordmark PNG  |
-| `tagline-image` | the 345x20 tagline SVG     |
-| `crest-image`   | `./assets/ukssc-crest.png` |
-| `logo-base`     | `./assets/logos/`          |
-
-Everything else — copy, stats, FAQs, sponsor list — is in the config block at
-the top of the file.
 
 ## Sponsor logo carousel
 
@@ -267,3 +245,148 @@ Note that cdnfonts, the usual Open Sauce host, is currently returning 500s.
   points at the Eventbrite listing (opens in a new tab).
 - **Stat figures** — 600+ / 30 / 40 came from the Figma. Worth checking against
   2026 numbers, given the sponsor list currently has 22 names.
+
+## The 2026 refresh
+
+Everything below was rebuilt against material the Communications Dept supplied.
+No invented copy, no substituted colours.
+
+| Source | Drives |
+| --- | --- |
+| `Blastoff Brand Deck.pdf` | palette, typefaces, minimum text size, logo rules |
+| `BlastOff! Copywriting.docx` | About, Why visit, Legacy |
+| `Company Details.docx` | partner tiers, partner profiles, logo restrictions |
+| `Company Logos/`, `AvePoint Logo/` | official partner artwork + their guidelines |
+| `BlastOff! Website Update/Photos to Use` | gallery, About plate, Legacy plate |
+| <https://www.theukssc.co.uk> | every outbound link and the contact address |
+
+These source folders are **deliberately not committed** — see `.gitignore`. They
+are large, and more importantly several are partner-confidential (PwC's
+third-party co-branding guidelines, HSBC's TMLA brand guidelines, MAS's branding
+guidelines). Committing them would publish those documents on a public Pages
+site. Keep them locally and in Drive.
+
+### Brand guidelines, as applied
+
+- **Palette** is the deck's exact hexes: Electric Lime `#E9FF47`, Beige Linen
+  `#FFF5E9`, Black `#141414`, Vivid Royal `#2216B4`, Icy Aqua `#BDF5F4`. The old
+  sheet used `#DFFF3E` / `#FFF6E7` / `#ADF8F5` plus a maroon — none of which are
+  brand colours.
+- **Every pairing is one the Colour Usage page sanctions.** On Black that means
+  Lime or Beige Linen only, so body copy is warm cream rather than white.
+- **Icy Aqua is a background, not a foreground.** p8 shows it as a ground
+  carrying Black or Vivid Royal and never as text on Black, so nothing on the
+  dark page is set in it.
+- **Typefaces** are League Spartan (primary) and Open Sauce (secondary), in
+  Regular and Bold only — the deck documents no Medium, and Open Sauce ships
+  here as 400/700, so a `500` was being synthesised. DM Sans is gone.
+- **The 15px minimum text size is enforced.** Verified in-browser: nothing
+  computes below it. This is why the small-caps labels read larger than a
+  typical web eyebrow. It is the guideline, not an oversight.
+- **Partner marks are never filtered or recoloured**, which several partners'
+  guidelines require — MFA's forbids any alteration. The cream band is what
+  makes that possible for dark artwork.
+
+### The logo lockup
+
+p3 "Main Logo" is the wordmark **and** "to new horizons!" set as one object, not
+a wordmark with a subtitle under it. Measured off the deck rendered at 3400px
+and reproduced to within 2%:
+
+| | Deck | Now |
+| --- | --- | --- |
+| Gap, wordmark ink → tagline ink | 0.192h | 0.190h |
+| Tagline ink height | 0.126h | 0.126h |
+| Tagline width ÷ wordmark width | 0.247 | 0.252 |
+| Clear space, all four sides | 0.5h | 0.500h |
+
+The tagline is Electric Lime, not Icy Aqua: p14 forbids two colours in the logo
+at once. It is League Spartan — that matches the deck's width-to-ink ratio (9.4
+against a measured 9.05–9.24) where Open Sauce gives 9.9; the giveaway is the
+very tall x-height, the `t` barely clearing the `o`. The deck's lockup is tracked
+to about −0.02em, tighter than the −0.01em the typeface pages give for text.
+
+**Clear space is `cqw`, not `%`.** Percentage padding resolves against the
+*containing block's* width, not the element's own, so `padding: 9%` produced
+0.93h instead of 0.5h — that, not the tagline, was what made the hero cavernous.
+
+**One deliberate departure:** held to the p3 proportion the tagline computes to
+8px on a 375px phone, below p10–p11's own 15px minimum. The floor wins, so under
+a ~381px wordmark the lockup stretches slightly rather than the type going
+sub-legible. The gap is in `em` so it stays proportional.
+
+### Partner tiers and logos
+
+The "Full List" table resolves to **1 Gold + 8 Silver + 1 Bronze + 13 government
+agencies = 23**, matching the 23 files in `assets/logos/`. Gold (JPMorganChase)
+and Bronze (SGN) are single marks and sit still; Silver and the agencies scroll.
+This **reassigns the gold tier** — the previous build gave it to EDB, which the
+table lists as a government agency. The page says **20+** throughout, the Why
+visit copy's figure.
+
+**12 of the 23 now use official artwork.** `tools/bake-partner-logos.py` builds
+them. Half the supplied files are JPEGs or PDFs flattened onto white and the band
+is cream, so the background has to come out — but a global white-knockout would
+punch holes through MAS's reversed-out lettering, the white rays at the centre of
+bp's Helios, and the LSE letters knocked out of the red block. The script
+flood-fills inward from the border, removing only white *connected to the edge*,
+then feathers a two-pixel fringe so the original antialiasing survives.
+
+Still online-sourced, no artwork supplied: UOB, SGN, EDB, MOE, A*STAR, MOT, SCDF,
+ICA, CNB, SPS, HTX.
+
+Minimum sizes, enforced in code from the partners' own documents:
+
+| Partner | Minimum | Source |
+| --- | --- | --- |
+| PwC | 62px wide | Third-Party Co-Branding Guidelines, p4 |
+| HSBC | 105px wide | TMLA Brand Guidelines, p11 |
+| Bank of America | 125px wide | logo sheet in Company Details.docx |
+| LTA | 132px (35mm print at 96ppi) | Corporate Logo Guidelines, Jan 2024 |
+
+### Photography
+
+Five supplied JPEGs (up to 21MB) resized into `assets/photos/` at 1600w and 900w
+and served with `srcset` — 2.3MB for all ten files. Four in the gallery rail, one
+as the About plate, and the older orange banner in Legacy where the earlier
+branding is the point. Captions name no year and no venue: the files carry no
+shoot date and these were not taken at Suntec.
+
+### Contrast and palette fixes from the compliance audit
+
+- CTA hover was `#F1FF7A`, absent from the deck. The ground now stays Lime and
+  the label moves to Vivid Royal — the other sanctioned foreground — at 10.2:1.
+- Pill numerals hovered to 55%-opacity Black on Lime: an unlisted `#747E2B` at
+  3.96:1. Now Vivid Royal at 10.2:1.
+- **The mobile drawer's CTA was invisible.** `.nav-list a` outranks `.btn-solid`
+  on specificity, so it painted the button's label in the muted nav colour —
+  1.01:1. Nav rules are now scoped `a:not(.btn)`. All five solid CTAs measure
+  16.54:1.
+- Opacity recipes consolidated from 21 ad-hoc `rgba()` values into an
+  **eleven-step ladder** declared at the top of the stylesheet. **This still
+  needs brand sign-off**: the deck publishes solid swatches and documents no
+  tint scale, so every translucent value is a derivation. No new hue is
+  introduced — each step is Beige Linen or Black at a stated alpha.
+
+## Settled with the committee
+
+- Event name is **BlastOFF!** in prose. The logotype artwork stays lowercase
+  `blastoff!` — p14 forbids changing the logo's text.
+- The council is the **United Kingdom Singapore Student Council** — singular, no
+  apostrophe, no hyphen, matching theukssc.co.uk. This disagrees with the crest
+  and the roll-up banner, which read "Students' Council"; the artwork is
+  untouched, only the typeset name.
+- **20+** partners, not 23.
+- Contact is `enquiries@theukssc.co.uk`, the published general inbox.
+
+## Still open
+
+- **Venue name** — the copy doc says "Suntec City Convention & Exhibition
+  Centre"; the correct name is "Suntec Singapore Convention & Exhibition
+  Centre", which is what the page uses.
+- **"bp Singapore" is intentionally lowercase.** bp's identity has been
+  lowercase since 2000, the supplied artwork shows a lowercase wordmark, and
+  Company Details.docx writes it lowercase. Every other partner name was checked
+  against the supplied list and official usage.
+- **FAQ copy** is still ours, not the committee's, and marked TODO in the file.
+- **Opacity ladder** needs brand approval (above).
