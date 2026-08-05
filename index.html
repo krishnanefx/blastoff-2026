@@ -5,47 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#141414">
 
-  <title>Blastoff! 2026 — UKSSC</title>
-  <meta name="description" content="Blastoff! 2026 — to new horizons. The UKSSC's flagship careers event for overseas Singaporean students. 14 August 2026, 4pm–9pm, Suntec Singapore Convention &amp; Exhibition Centre, Level 3 Summit 1. Free admission.">
+  <title>BlastOFF! 2026 — to new horizons!</title>
+  <meta name="description" content="BlastOFF! 2026 — to new horizons! The premier career fair connecting Singaporean talent worldwide with top careers in Singapore. Friday 14 August 2026, 4pm–9pm, Suntec Singapore Convention &amp; Exhibition Centre, Level 3 Summit 1. Free admission.">
 
-  <!-- Share card. These MUST be absolute URLs — most scrapers reject relative
-       ones outright, and the few that resolve them composite a transparent PNG
-       onto white. og-blastoff-2026-v2.png is 1200x630 on the brand background.
-       Regenerate with tools/make-og-image.py; if you change the artwork, give
-       the file a NEW name, because Facebook, WhatsApp and LinkedIn all cache
-       the image per-URL and will keep serving the old one otherwise. -->
+  <!-- AT LAUNCH: delete this line. It is the only thing keeping the page out of
+       search results. It is still here because this repo publishes to
+       krishnanefx.github.io, which is a staging mirror — the canonical below
+       points at blastoff2026.com, and indexing the mirror would compete with it. -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- The site ships on its own domain, blastoff2026.com, so everything that has
+       to be absolute is absolute. og:url and og:image cannot be relative — chat
+       apps and crawlers resolve them against nothing. Links out to the council
+       are fully qualified to theukssc.co.uk for the same reason: this is no
+       longer a page inside that site.
+
+       If you change the share artwork, give the file a NEW name. Facebook,
+       WhatsApp and LinkedIn all cache the image per-URL and will otherwise keep
+       serving the old one. Regenerate with tools/make-og-image.py. -->
+  <link rel="canonical" href="https://blastoff2026.com/">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://krishnanefx.github.io/blastoff-2026/">
-  <meta property="og:site_name" content="UKSSC">
-  <meta property="og:title" content="Blastoff! 2026 — UKSSC">
-  <meta property="og:description" content="To new horizons! 14 August 2026, 4pm–9pm at Suntec Singapore Convention &amp; Exhibition Centre. Free admission.">
-  <meta property="og:image" content="https://krishnanefx.github.io/blastoff-2026/assets/og-blastoff-2026-v2.png">
-  <meta property="og:image:type" content="image/png">
+  <meta property="og:url" content="https://blastoff2026.com/">
+  <meta property="og:site_name" content="BlastOFF! 2026">
+  <meta property="og:title" content="BlastOFF! 2026 — to new horizons!">
+  <meta property="og:description" content="Friday 14 August 2026, 4pm–9pm at Suntec Singapore Convention &amp; Exhibition Centre. 20+ corporate partners. Free admission.">
+  <meta property="og:image" content="https://blastoff2026.com/assets/og-blastoff-2026-v2.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Blastoff! 2026 — to new horizons. 14 August 2026, 4pm–9pm, Suntec Singapore. Free admission.">
-
+  <meta property="og:image:alt" content="BlastOFF! 2026 — to new horizons! Friday 14 August 2026, 4pm–9pm, Suntec Singapore Convention &amp; Exhibition Centre.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Blastoff! 2026 — UKSSC">
-  <meta name="twitter:description" content="To new horizons! 14 August 2026, 4pm–9pm at Suntec Singapore Convention &amp; Exhibition Centre. Free admission.">
-  <meta name="twitter:image" content="https://krishnanefx.github.io/blastoff-2026/assets/og-blastoff-2026-v2.png">
 
-  <link rel="canonical" href="https://krishnanefx.github.io/blastoff-2026/">
   <link rel="icon" href="./assets/ukssc-crest.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="./assets/fonts/open-sauce-sans-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/blastoff-wordmark.png" as="image" fetchpriority="high">
 
   <style>
     html, body { margin: 0; padding: 0; background: #141414; }
-    /* Reserve the fold so the yellow wordmark doesn't flash against white. */
     ukssc-blastoff:not(:defined) { display: block; min-height: 100vh; }
+
+    /* The skip link lives here, not in the component's shadow root. A shadow
+       target is not reachable via document.getElementById, so native fragment
+       navigation and auditing tools cannot resolve it. */
+    .skip-link {
+      position: absolute; top: 0; left: 0; z-index: 100;
+      transform: translateY(-130%);
+      /* Electric Lime + Black — brand deck p6, and the first sanctioned
+         pairing on the Colour Usage page. */
+      background: #E9FF47; color: #141414;
+      padding: 14px 20px; text-decoration: none; font-weight: 700; font-size: 15px;
+      font-family: 'Open Sauce Sans', system-ui, sans-serif;
+      transition: transform .18s ease;
+    }
+    .skip-link:focus { transform: none; }
+    #content:focus { outline: none; }
   </style>
 </head>
 <body>
-  <ukssc-blastoff></ukssc-blastoff>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div id="content" tabindex="-1">
+    <ukssc-blastoff></ukssc-blastoff>
+  </div>
   <!-- Bump ?v= on every deploy. GitHub Pages caches assets, so without this a
-       visitor who loaded a bad build keeps it until their cache expires. -->
-  <script src="./blastoff-element.js?v=5"></script>
+       visitor who loaded a bad build keeps it. -->
+  <script src="./blastoff-element.js?v=1"></script>
 </body>
 </html>

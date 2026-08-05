@@ -1,3 +1,24 @@
 .DS_Store
 **/.DS_Store
 node_modules/
+
+# ---- committee source material -------------------------------------------
+# Not committed on purpose. Two reasons:
+#
+#  1. Several of these are partner-confidential — PwC's third-party co-branding
+#     guidelines, HSBC's TMLA brand guidelines, MAS's branding guidelines. This
+#     repo publishes to GitHub Pages, so committing them would put partner
+#     internal documents on a public URL.
+#  2. They are large (~130MB) and nothing here needs them at runtime. The
+#     processed outputs are committed: assets/logos/, assets/photos/.
+#
+# Keep the originals locally and in Drive. tools/bake-partner-logos.py rebuilds
+# the logos from them; tools/logo-sources/ holds the online-sourced fallbacks.
+*.zip
+Company Logos/
+AvePoint Logo/
+BlastOff! Website Update/
+Blastoff Brand Deck.pdf
+
+# Intermediate rasters from the logo bake, regenerated on every run.
+tools/logo-render/
