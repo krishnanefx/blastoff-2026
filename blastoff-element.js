@@ -936,8 +936,11 @@
   .contact a:hover{border-bottom-color:var(--lime);}
 
   /* ---- footer ---- */
+  /* padding-BLOCK, not the shorthand. .foot also carries .wrap, and a padding
+     shorthand here reset .wrap's padding-inline to 0 — the whole footer was
+     running flush to the screen edge on a phone. Same trap as .hero had. */
   .foot{border-top:1px solid var(--hair);
-    padding:clamp(36px,5vw,70px) 0 clamp(88px,11vw,120px);}
+    padding-block:clamp(36px,5vw,70px) clamp(88px,11vw,120px);}
   .presented{display:flex;flex-wrap:wrap;gap:clamp(26px,5vw,74px);align-items:center;
     padding-bottom:clamp(28px,3.6vw,46px);border-bottom:1px solid var(--hair);}
   .presented div{display:flex;align-items:center;gap:16px;}
@@ -946,8 +949,13 @@
   .presented img{height:52px;width:auto;object-fit:contain;}
   .foot-tagline{margin:0 0 0 auto;font-family:var(--display);font-weight:500;
     font-size:clamp(18px,2vw,26px);letter-spacing:-.01em;color:var(--lime);}
+  /* Three groups, so auto-fit lands on 1, 2 or 3 columns. Two is the bad case:
+     the third group wraps to a second row that starts below the TALLEST group
+     in the first, leaving a hole under the shorter one. So go straight from one
+     column to three, skipping the ragged middle state. */
   .foot-cols{display:grid;gap:clamp(24px,3.6vw,50px);margin-top:clamp(28px,3.6vw,46px);
-    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));align-items:start;}
+  @media (max-width:700px){ .foot-cols{grid-template-columns:1fr;} }
   .foot h3{margin:0 0 14px;font-family:var(--ui);font-weight:700;font-size:15px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--meta);}
   .foot ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
