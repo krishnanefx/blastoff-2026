@@ -1,36 +1,33 @@
 /* =============================================================================
- * <ukssc-blastoff> — BlastOFF! 2026
+ * <ukssc-blastoff-draft> — BlastOff! 2026
  * -----------------------------------------------------------------------------
- * The site. Promoted from /draft-1/ on 5 August 2026; the previous Wix
- * custom-element build is tagged v1-wix-element in git and zipped alongside
- * the repo as ukssc-blastoff-site-v1-20260803.zip.
+ * Separate from the live blastoff-element.js so neither can affect the other.
+ * Lives at /draft-1/ and reads its artwork from ../assets/.
  *
  * Sources of truth, all supplied by the UKSSC Communications Dept:
  *   • "Blastoff Brand Deck.pdf"            — palette, typefaces, logo rules
  *   • "BlastOff! Copywriting.docx"         — About / Why visit / Legacy copy
  *   • "Company Details.docx"               — partner tiers and partner profiles
- *   • "Company Logos/", "AvePoint Logo/"   — official partner artwork
  *   • "BlastOff! Website Update/Photos to Use" — event photography
  *
  * BRAND COMPLIANCE NOTES
  *   Palette is the deck's exact hexes (p6–p7) and every foreground/background
  *   pairing on this page is one the Colour Usage guide sanctions (p8): on Black
  *   only Electric Lime or Beige Linen; on Beige Linen only Black or Vivid Royal.
- *   That is why body copy is warm Beige Linen rather than plain white, why the
- *   cream band's accents are Vivid Royal, and why Icy Aqua appears nowhere as a
- *   foreground — p8 only ever shows it as a ground.
+ *   That is why body copy is warm Beige Linen rather than plain white and why
+ *   the cream band's accents are Vivid Royal rather than the old maroon.
  *
  *   Typefaces are League Spartan (primary, display) and Open Sauce (secondary,
- *   UI and body), per p10–p11, in Regular and Bold only — the deck documents no
- *   Medium. The 15px minimum text size is enforced; no type on this page is set
- *   below it, which is why the small caps labels are larger than a typical web
- *   eyebrow.
+ *   UI and body), per p10–p11. The deck's 15px minimum text size is enforced —
+ *   no type on this page is set below it, which is why the small caps labels
+ *   are larger than a typical web eyebrow.
  *
- *   The logo obeys p12–p14: the tagline is part of the Main Logo lockup and sits
- *   at the deck's own 0.19h below the wordmark, the whole lockup carries 0.5h of
- *   clear space, and there is no glow, recolour, rotation or distortion. Partner
- *   marks are likewise never filtered — several partners' guidelines (MFA's
- *   especially) forbid any alteration, which is what the cream band is for.
+ *   The logo obeys p12–p14: 0.5h of clear space on every side (the .mark box
+ *   pads to exactly that), no glow, no recolour, no rotation, no distortion,
+ *   and it is never rendered below the 70px digital minimum. Partner marks are
+ *   likewise never filtered or recoloured — several partners' own guidelines
+ *   (MFA's especially) forbid any alteration, which is what the cream band is
+ *   for: it lets dark artwork sit on a light ground untouched.
  * ========================================================================== */
 
 (() => {
@@ -49,6 +46,7 @@
   const CONFIG = {
     ticketsUrl: 'https://www.eventbrite.sg/e/blastoff-2026-to-new-horizons-tickets-1995329425023',
     heroImage: asset('./assets/blastoff-wordmark.png'),
+    gohImage: asset('./assets/jeffrey-siow-goh.jpg'),
     crestImage: asset('./assets/ukssc-crest.png'),
     logoBase: asset('./assets/logos/'),
     photoBase: asset('./assets/photos/'),
@@ -64,10 +62,11 @@
 
   /* Every one of these is taken from theukssc.co.uk itself — the council's own
    * navigation and footer — rather than guessed. They replace the "#" stubs the
-   * first draft was carrying for Constitution, Telegram and LinkedIn.
+   * draft was carrying for Constitution, Telegram and LinkedIn.
    *
-   * All are fully qualified. The site runs on its own domain, so a root-relative
-   * /our-constitution would resolve against blastoff2026.com and 404. */
+   * The council's site writes its own name without a hyphen ("United Kingdom
+   * Singapore Student Council"); the copywriting doc hyphenates it. The page
+   * follows the doc. Worth settling in one direction eventually. */
   const UKSSC = {
     site: 'https://www.theukssc.co.uk',
     about: 'https://www.theukssc.co.uk/about',
@@ -84,18 +83,18 @@
   };
 
   const EVENT = {
-    name: 'BlastOFF! 2026',
+    name: 'BlastOff! 2026',
     tagline: 'to new horizons!',
     // Copywriting doc, ABOUT: "the premier career fair connecting Singaporean
     // talent worldwide with top careers in Singapore".
     proposition: 'The career fair connecting Singaporean talent worldwide with top careers in Singapore',
-    pitch: 'Explore global pathways, meet our 20+ corporate partners, and take your ' +
+    pitch: 'Explore global pathways, meet our 20+ partners, and take your ' +
            'career aspirations to new horizons.',
     dateLabel: 'Friday, 14 August 2026',
     dateShort: 'Fri 14 Aug 2026',
     timeLabel: '4pm – 9pm',
-    venue: 'Suntec Singapore Convention & Exhibition Centre',
-    venueShort: 'Suntec Singapore',
+    venue: 'Suntec Convention Centre',
+    venueShort: 'Suntec Convention Centre',
     venueDetail: 'Level 3, Summit 1',
     startISO: '2026-08-14T16:00:00+08:00',
     endISO: '2026-08-14T21:00:00+08:00',
@@ -123,7 +122,7 @@
     {
       figure: '40+', label: 'Partner societies',
       copy: 'Dedicated to connecting overseas Singaporean talent',
-      // theukssc.co.uk lists them by region; roughly forty, which is where the
+      // theukssc.co.uk lists them by region; roughly 40, which is where the
       // figure in the copy comes from.
       link: { href: UKSSC.societies, text: 'Browse the society network ↗', ext: true },
     },
@@ -138,15 +137,34 @@
     'Meet other Singaporean students studying around the world',
   ];
 
+  const EVENT_FLOW = [
+    { time: '4:00 pm', title: 'Career Fair Opens', body: 'Doors open for registration, networking and employer booths.' },
+    { time: '4:45 pm', title: 'GOH Segment', body: 'Hear from Mr Jeffrey Siow, Minister for Transport and Second Minister for Finance.' },
+    { time: '5:30 pm', title: 'Food, Drinks and Networking', body: 'Refuel after the GOH segment and keep the conversations going.' },
+    { time: '6:00–9:00 pm', title: 'Career Fair Resumes', body: 'Meet participating organisations, explore pathways and connect with Singaporean talent.' },
+    { time: '9:00 pm', title: 'End of Event', body: 'Thank you for joining BlastOff! 2026.' },
+  ];
+
+  const GOH = {
+    name: 'Mr Jeffrey Siow',
+    role: 'Minister for Transport and Second Minister for Finance',
+    intro: 'We are honoured to welcome Mr Jeffrey Siow as our Guest-of-Honour for BlastOff! 2026.',
+    paragraphs: [
+      'Mr Siow oversees Singapore’s air, land and sea transport, and helps shape the country’s fiscal and economic strategy.',
+      'Before taking office, Mr Siow was Second Permanent Secretary at both the Ministry of Manpower and the Ministry of Trade and Industry, where he led national efforts to grow Singapore’s economy, and to develop a productive workforce and progressive workplaces to benefit Singaporeans.',
+    ],
+  };
+
   // Copywriting doc, ABOUT — the supplied paragraph, broken for reading.
   const ABOUT = [
-    'Join us for BlastOFF! 2026, the premier career fair connecting Singaporean ' +
+    'Join us for BlastOff! 2026, the premier career fair connecting Singaporean ' +
     'talent worldwide with top careers in Singapore.',
-    'This year’s BlastOFF! will be happening on Friday, 14 August 2026 at the ' +
-    'Suntec Singapore Convention & Exhibition Centre. Explore global pathways and ' +
+    'This year’s BlastOff! will be happening on Friday, 14 August 2026 at the ' +
+    'Suntec Convention Centre. Explore global pathways and ' +
     'connect with over 400 attendees across the UK, US, EU and Singapore.',
-    'This is your opportunity to meet our 20+ corporate partners and take your ' +
-    'career aspirations to new horizons!',
+    'This is your opportunity to meet representatives from 20+ participating ' +
+    'organisations across the private and public sectors and take your ' +
+            'career aspirations to new horizons!',
   ];
 
   // Copywriting doc, LEGACY — both headed passages, verbatim.
@@ -164,9 +182,9 @@
     {
       head: 'Sparking Inspiration and Passion',
       body: 'Since 2021, the UKSSC has held the annual “Through the Generations” ' +
-            'career fair (renamed “BlastOFF!” as of 2024) to connect Singaporean ' +
-            'students and alumni generations. BlastOFF! has helped countless ' +
-            'students find meaningful careers and supported corporate partners’ ' +
+            'career fair (renamed “BlastOff!” as of 2024) to connect Singaporean ' +
+            'students and alumni generations. BlastOff! has helped countless ' +
+            'students find meaningful careers and supported partner organisations’ ' +
             'outreach efforts since.',
     },
   ];
@@ -176,11 +194,16 @@
     mapUrl: 'https://maps.google.com/?q=Suntec+Singapore+Convention+%26+Exhibition+Centre',
   };
 
-  // Event photography supplied in "Photos to Use", resized into ./assets/photos.
+  // Event photography supplied in "Photos to Use", resized into ../assets/photos.
   // `alt` describes the picture; `caption` is the line printed under the frame.
   // Neither claims a year or a venue, because the supplied files carry no
   // shoot date and these were plainly not taken at Suntec.
   const GALLERY = [
+    {
+      size: 'sm', slug: 'arrival-queue',
+      alt: 'Attendees queueing behind rope barriers at the registration desk',
+      caption: 'Registration on arrival',
+    },
     {
       size: 'lg', slug: 'fair-floor',
       alt: 'A crowded exhibition hall of students moving between employer booths',
@@ -196,85 +219,70 @@
       alt: 'Rows of seated students listening to a talk',
       caption: 'A house full!',
     },
-    {
-      size: 'sm', slug: 'arrival-queue',
-      alt: 'Attendees queueing behind rope barriers at the registration desk',
-      caption: 'Registration on arrival',
-    },
   ];
 
-  /* Partner tiers exactly as set out in the "Full List" table of Company
-   * Details.docx: one Gold, eight Silver, one Bronze and thirteen government
-   * agencies — 23 in total, and 23 files in assets/logos/. The page says "20+"
-   * throughout rather than 23, which is the Why visit copy's figure and the one
-   * the committee settled on. Gold and Bronze are single marks, so they are set
-   * statically; the two long tiers scroll.
-   *
-   * minWidth values come from the partners' own guideline documents in
-   * Company Logos/ — see the table in the README. They override our equal-ink
-   * normalisation, which would otherwise set some below their own floor. */
+  /* Partner tiers for the current site copy. Community and Gold are shown first,
+   * followed by the Bronze and Government partner marquees. */
   const PARTNERS = [
     {
-      key: 'gold', label: 'Gold partner', mode: 'static',
-      items: [{ name: 'JPMorganChase', slug: 'jpmorgan' }],
-    },
-    {
-      key: 'silver', label: 'Silver partners', mode: 'marquee', dir: 1,
-      items: [
-        { name: 'PwC', slug: 'pwc', minWidth: 62 },      // 62px on screen, p4
-        { name: 'UOB', slug: 'uob' },
-        { name: 'Accenture', slug: 'accenture' },
-        { name: 'AvePoint', slug: 'avepoint' },
-        { name: 'HSBC', slug: 'hsbc', minWidth: 105 },   // 26mm / 105px, p11
-        { name: 'bp Singapore', slug: 'bp' },
-        // Company Details.docx embeds Bank of America's own logo sheet: the
-        // horizontal lockup has a 125px minimum width and needs one cap height
-        // of clear space.
-        { name: 'Bank of America', slug: 'bofa', minWidth: 125 },
-        { name: 'LSE Alumni Association of Singapore', slug: 'lse-alumni' },
-      ],
-    },
-    {
-      key: 'bronze', label: 'Bronze partner', mode: 'static',
+      key: 'community', label: 'Community partner', mode: 'static',
       items: [{ name: 'Singapore Global Network', slug: 'sgn' }],
     },
     {
-      key: 'gov', label: 'Government agencies', mode: 'marquee', dir: -1,
+      key: 'gold', label: 'Gold partners', mode: 'static',
       items: [
+        { name: 'JPMorgan Chase', slug: 'jpmorgan' },
         { name: 'Economic Development Board (EDB)', slug: 'edb' },
-        { name: 'Ministry of Education (MOE)', slug: 'moe' },
-        { name: 'Ministry of Foreign Affairs (MFA)', slug: 'mfa' },
-        { name: 'Monetary Authority of Singapore (MAS)', slug: 'mas' },
-        { name: 'Ministry of Finance (MOF)', slug: 'mof' },
+      ],
+    },
+    {
+      key: 'bronze', label: 'Bronze partners', mode: 'marquee', dir: 1,
+      items: [
+        // Company Details.docx embeds Bank of America's own logo sheet: the
+        // horizontal lockup has a 125px minimum width and needs one cap height
+        // of clear space. The equal-ink sizer would otherwise take it below that.
+        { name: 'Accenture', slug: 'accenture' },
+        { name: 'AvePoint', slug: 'avepoint' },
+        { name: 'Bank of America', slug: 'bofa', minWidth: 125 },
+        { name: 'bp Singapore', slug: 'bp' },
+        { name: 'HSBC', slug: 'hsbc' },
+        { name: 'LSE Alumni Association of Singapore', slug: 'lse-alumni' },
+        { name: 'PwC', slug: 'pwc' },
+        { name: 'UOB', slug: 'uob' },
+      ],
+    },
+    {
+      key: 'gov', label: 'Government partners', mode: 'marquee', dir: -1,
+      items: [
         { name: 'Agency for Science, Technology and Research (A*STAR)', slug: 'astar' },
-        // LTA states 35mm minimum length for print; 132px is that at 96ppi.
-        { name: 'Land Transport Authority (LTA)', slug: 'lta', minWidth: 132 },
+        { name: 'Central Narcotics Bureau (CNB)', slug: 'cnb' },
+        { name: 'Home Team Science and Technology Agency (HTX)', slug: 'htx' },
+        { name: 'Immigration & Checkpoints Authority (ICA)', slug: 'ica' },
+        { name: 'Land Transport Authority (LTA)', slug: 'lta' },
+        { name: 'Monetary Authority of Singapore (MAS)', slug: 'mas' },
+        { name: 'Ministry of Education (MOE)', slug: 'moe' },
+        { name: 'Ministry of Finance (MOF)', slug: 'mof' },
+        { name: 'Ministry of Foreign Affairs (MFA)', slug: 'mfa' },
         { name: 'Ministry of Transport (MOT)', slug: 'mot' },
         { name: 'Singapore Civil Defence Force (SCDF)', slug: 'scdf' },
-        { name: 'Immigration & Checkpoints Authority (ICA)', slug: 'ica' },
-        { name: 'Central Narcotics Bureau (CNB)', slug: 'cnb' },
         { name: 'Singapore Prison Service (SPS)', slug: 'sps' },
-        { name: 'Home Team Science and Technology Agency (HTX)', slug: 'htx' },
       ],
     },
   ];
 
-  /* Partner profiles, verbatim from the "About" table of Company Details.docx.
-   * Only the twelve partners whose cell was filled in appear here; the rest are
-   * listed in the marquee above and gain a profile the moment copy arrives. */
+  /* Partner profiles from the supplied client copy. Partners without profile
+   * copy remain listed in the tier bands above until their text arrives. */
   const PROFILES = [
     {
-      name: 'JPMorganChase', tier: 'Gold partner',
-      body: 'Established in 1964, our Singapore office is a comprehensive provider ' +
-            'of corporate and investment banking, commercial banking, asset ' +
-            'management, and private banking. We serve local corporations, ' +
-            'multinationals, government, and private clients with a full suite of ' +
-            'market-leading products and services across various sectors and asset ' +
-            'classes. With over 100 years in the Asia Pacific region, we operate in ' +
-            '17 markets, leveraging our global strength and local expertise.',
+      name: 'JPMorgan Chase', tier: 'Gold partner',
+      paragraphs: [
+        'Established in 1964, our Singapore office is a comprehensive provider of corporate and investment banking, commercial banking, asset management, and private banking. We serve local corporations, multinationals, government, and private clients with a full suite of market-leading products and services across various sectors and asset classes. With over 100 years in the Asia Pacific region, we operate in 17 markets, leveraging our global strength and local expertise.',
+        'In Asia Pacific, we are dedicated to promoting economic growth and inclusion through philanthropic initiatives focused on workforce readiness, small business development, and financial capability. Our investments aim to create quality jobs for underserved communities, support sustainable small businesses, and provide marginalized individuals with access to affordable financial products for greater financial security. This commitment drives our Foundation’s giving and employee engagement across the region.',
+        'J.P. Morgan is a global financial services leader, offering solutions to major corporations, governments, and institutions in over 100 countries. By 2025, JPMorgan Chase plans to deploy $2 billion in philanthropic capital worldwide. We also lead volunteer activities for employees in local communities, utilizing our resources, including access to capital, economies of scale, and global expertise.',
+      ],
     },
     {
-      name: 'PwC', tier: 'Silver partner',
+      name: 'PwC', tier: 'Bronze partner',
       body: 'At PwC, we help clients build trust and reinvent so they can turn ' +
             'complexity into competitive advantage. We’re a tech-forward, ' +
             'people-empowered network with more than 364,000 people in 136 ' +
@@ -283,61 +291,53 @@
             'sustain momentum.',
     },
     {
-      name: 'Accenture', tier: 'Silver partner',
-      body: 'Accenture is a leading global professional services company that helps ' +
-            'the world’s leading businesses, governments and other organisations ' +
-            'build their digital core, optimise their operations, accelerate revenue ' +
-            'growth and enhance citizen services — creating tangible value at speed ' +
-            'and scale. We are a talent- and innovation-led company with 732,000 ' +
-            'people serving clients in more than 120 countries.',
+      name: 'UOB', tier: 'Bronze partner',
+      paragraphs: [
+        'United Overseas Bank Limited (UOB) is a leading bank in Asia with a global network of more than 500 branches and offices in 19 countries and territories in Asia Pacific, Europe and North America. In Asia, we operate through our head office in Singapore and banking subsidiaries in China, Indonesia, Malaysia and Thailand, as well as branches and offices. Our history spans more than 80 years.',
+        'Over this time, we have been guided by our values – Honorable, Enterprising, United and Committed. This means we always strive to do what is right, build for the future, work as one team and pursue long-term success. It is how we work, consistently, be it towards the company, our colleagues or our customers.',
+      ],
     },
     {
-      name: 'AvePoint', tier: 'Silver partner',
-      body: 'As the global leader in data protection, serving more than 28,000 ' +
-            'customers worldwide, AvePoint empowers organisations to innovate with ' +
-            'confidence through unified data security, governance, and resilience. ' +
-            'Headquartered in Jersey City, New Jersey, with its APAC headquarters in ' +
-            'Singapore, AvePoint established a S$100 million R&D hub, supported by ' +
-            'the Singapore Economic Development Board (EDB), to advance AI ' +
-            'innovation, strengthen regional digital capabilities, and develop the ' +
-            'next generation of technology talent.',
+      name: 'Accenture', tier: 'Bronze partner',
+      paragraphs: [
+        'Accenture is a leading global professional services company that helps the world’s leading businesses, governments and other organizations build their digital core, optimize their operations, accelerate revenue growth and enhance citizen services—creating tangible value at speed and scale. We are a talent- and innovation-led company with 732,000 people serving clients in more than 120 countries.',
+        'Technology is at the core of change today, and we are one of the world’s leaders in helping drive that change, with strong ecosystem relationships. Visit us at www.accenture.com.',
+      ],
     },
     {
-      name: 'HSBC', tier: 'Silver partner',
+      name: 'AvePoint', tier: 'Bronze partner',
+      body: 'As the global leader in data protection, serving more than 28,000 customers worldwide, AvePoint empowers organizations to innovate with confidence through unified data security, governance, and resilience. Headquartered in Jersey City, New Jersey, with its APAC headquarters in Singapore, AvePoint established a S$100 million R&D hub, supported by the Singapore Economic Development Board (EDB), to advance AI innovation, strengthen regional digital capabilities, and develop the next generation of technology talent.',
+    },
+    {
+      name: 'HSBC', tier: 'Bronze partner',
       body: 'HSBC was founded in Hong Kong in March 1865 to finance growing trade ' +
             'between Europe, India and China. Today we operate in more than 50 ' +
             'countries and territories but retain a strong commitment to Hong Kong, ' +
             'which is one of our two home markets.',
     },
     {
-      name: 'bp Singapore', tier: 'Silver partner',
+      name: 'bp Singapore', tier: 'Bronze partner',
       body: 'As a leading global energy company with a presence in 61 countries, ' +
             'bp’s purpose is to deliver energy to the world, today and tomorrow. We ' +
-            'are one of only a few companies that can deliver energy — at scale — to ' +
+            'are one of only a few companies that can deliver energy – at scale – to ' +
             'countries and millions of customers every day. With more than 100 years ' +
             'of experience, we bring together technology, innovation and deep ' +
             'expertise that keeps communities moving — and we’re still evolving.',
     },
     {
-      name: 'Bank of America', tier: 'Silver partner',
-      body: 'Bank of America is one of the world’s leading financial institutions, ' +
-            'serving clients across Asia Pacific through a network of offices in key ' +
-            'markets. For more than 75 years in the region, we have helped companies, ' +
-            'institutions and investors achieve their goals while providing employees ' +
-            'with opportunities to grow, innovate and make an impact in a global ' +
-            'organisation.',
+      name: 'Bank of America', tier: 'Bronze partner',
+      body: 'Bank of America is one of the world’s leading financial institutions, serving clients across Asia Pacific through a network of offices in key markets. For more than 75 years in the region, we have helped companies, institutions and investors achieve their goals while providing employees with opportunities to grow, innovate and make an impact in a global organization.',
     },
     {
-      name: 'LSE Alumni Association of Singapore', tier: 'Silver partner',
-      body: 'The LSE Alumni Association of Singapore (LSEAAS) is one of the oldest ' +
-            'and most active alumni chapters in Asia, bringing together generations ' +
-            'of LSE graduates to connect, collaborate, and contribute to Singapore’s ' +
-            'vibrant community. Established in 1973, LSEAAS is celebrating over 50 ' +
-            'years of alumni community and engagement, and counts more than 3,000 ' +
-            'alumni in Singapore — one of the largest LSE alumni networks globally.',
+      name: 'LSE Alumni Association of Singapore', tier: 'Bronze partner',
+      body: 'The LSE Alumni Association of Singapore (LSEAAS) is one of the oldest and most active alumni chapters in Asia, bringing together generations of LSE graduates to connect, collaborate, and contribute to Singapore’s vibrant community. Established in 1973, LSEAAS is celebrating over 50 years of alumni community and engagement, and counts more than 3,000 alumni in Singapore — one of the largest LSE alumni networks globally. Our legacy stretches back even further, to our first graduate member in 1947, spanning decades of leadership and impact.',
     },
     {
-      name: 'Ministry of Foreign Affairs (MFA)', tier: 'Government agency',
+      name: 'Economic Development Board (EDB)', tier: 'Gold partner',
+      body: 'The Singapore Economic Development Board (EDB), a government agency under MTI, is responsible for strategies that enhance Singapore’s position as a global centre for business, innovation, and talent. Our mission is to create sustainable economic growth, with vibrant business and good job opportunities for Singapore.',
+    },
+    {
+      name: 'Ministry of Foreign Affairs (MFA)', tier: 'Government partner',
       body: 'The Ministry of Foreign Affairs (MFA) is at the heart of safeguarding ' +
             'and advancing Singapore’s interests in the global arena. As a Foreign ' +
             'Service Officer (FSO), you will stand on the frontlines of diplomacy — ' +
@@ -346,13 +346,13 @@
             'complex world.',
     },
     {
-      name: 'Monetary Authority of Singapore (MAS)', tier: 'Government agency',
+      name: 'Monetary Authority of Singapore (MAS)', tier: 'Government partner',
       body: 'The Monetary Authority of Singapore (MAS) is Singapore’s central bank ' +
             'and integrated financial regulator. MAS also works with the financial ' +
             'industry to develop Singapore as a dynamic international financial centre.',
     },
     {
-      name: 'Ministry of Finance (MOF)', tier: 'Government agency',
+      name: 'Ministry of Finance (MOF)', tier: 'Government partner',
       body: 'The Ministry of Finance (MOF) is a ministry of the Government of ' +
             'Singapore responsible for managing Singapore’s fiscal policies and the ' +
             'structure of its economy. We work to maintain international standards ' +
@@ -360,7 +360,15 @@
             'and corporate governance principles.',
     },
     {
-      name: 'Land Transport Authority (LTA)', tier: 'Government agency',
+      name: 'Ministry of Transport (MOT)', tier: 'Government partner',
+      body: 'At the Ministry of Transport (MOT), we spearhead developments in our air, land and sea transport sectors to advance Singapore’s economic competitiveness and Singaporeans’ quality of life. We seek dynamic, analytical and committed individuals to join our able MOT team in realising our vision of a global interconnected transport hub.',
+    },
+    {
+      name: 'Immigration & Checkpoints Authority (ICA)', tier: 'Government partner',
+      body: 'Immigration & Checkpoints Authority (ICA) is the Guardian of Singapore’s borders, with a mission to secure our borders and uphold Singapore laws on immigration and national registration. We are Singapore’s frontline, keeping Singapore connected to the world, while protecting our communities by keeping dangerous and illegal items off our shores.',
+    },
+    {
+      name: 'Land Transport Authority (LTA)', tier: 'Government partner',
       body: 'The Land Transport Authority (LTA) leads Singapore’s land transport ' +
             'development by planning, designing, building, and maintaining ' +
             'infrastructure and systems. Our goal is to enhance connectivity with a ' +
@@ -368,20 +376,30 @@
             'solutions. Given the wide-ranging scope of LTA’s work, career ' +
             'opportunities within LTA are diverse and dynamic.',
     },
+    {
+      name: 'Singapore Prison Service (SPS)', tier: 'Government partner',
+      body: 'Step into a world where every interaction is an opportunity to impact lives. Join us as Captains of Lives, where we empower change and transform lives, creating a safer and more inclusive Singapore — all while embracing dynamic career and personal growth.',
+    },
   ];
 
   // Eligibility first — it is the question that decides whether to register.
-  // TODO: confirm all four with the committee before this goes live.
   const FAQS = [
     {
-      q: 'Who can attend?',
-      a: 'BlastOFF! is built for Singaporean students and alumni worldwide, wherever ' +
-         'you are based. Admission is free, whether you are after an internship, a ' +
-         'graduate role, or simply want to understand the Singapore market.',
+      q: 'I’m a ______, can I still attend the event?',
+      answers: [
+        {
+          head: 'University Student',
+          body: 'Yes! We welcome all students from all nationalities and universities!',
+        },
+        {
+          head: 'Recent Graduate',
+          body: 'Of course! Whether you are after an internship, a graduate role, or simply want to understand the Singapore market, all are welcome.',
+        },
+      ],
     },
     {
-      q: 'Do I need to register in advance?',
-      a: 'Yes. Tickets are free but capacity at Suntec is limited, so reserve ahead.',
+      q: 'Do I need to register in advance, or can I walk in on the day?',
+      a: 'We do allow for walk-in registration, but capacity of the venue is limited. Reserve ahead on Eventbrite to ensure you get a spot!',
     },
     {
       q: 'What should I bring on the day?',
@@ -390,9 +408,13 @@
          'for the organisations you most want to meet.',
     },
     {
-      q: 'How do I get to Suntec?',
-      a: 'Suntec Singapore is a short covered walk from Promenade, Esplanade and ' +
+      q: 'How do I get to Suntec Convention Centre?',
+      a: 'Suntec Convention Centre is a short covered walk from Promenade, Esplanade and ' +
          'City Hall MRT stations. The fair is on Level 3, Summit 1.',
+    },
+    {
+      q: 'Will there be food and drinks provided?',
+      a: 'There will be food and drinks provided after the GOH segment ends at around 5.30 pm. Come early to avoid missing out!',
     },
   ];
 
@@ -400,14 +422,9 @@
    * secondary. Open Sauce ships with the repo as a local woff; League Spartan
    * comes from Google Fonts, which is where the deck's own specimen is set. */
   const FONT_SHEETS = [
-    // 400 and 700 only. The deck specifies Regular and Bold; it shows no Medium
-    // for either family, and Open Sauce ships here as 400/700, so a 500 request
-    // left the browser synthesising a weight nobody approved.
-    'https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap',
+    'https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;700&display=swap',
   ];
 
-  /* Open Sauce ships in the repo. Declared in the document, not the shadow
-     root, because @font-face only resolves in document scope. */
   const FONT_FACES = [
     '@font-face{font-family:"Open Sauce Sans";font-style:normal;font-weight:400;',
     'font-display:swap;src:url("', asset('./assets/fonts/open-sauce-sans-400.woff'), '") format("woff");}',
@@ -508,34 +525,18 @@
        foreground on Black — so nothing on this dark page is set in it. */
     --aqua:#BDF5F4;     /* Icy Aqua      — secondary, grounds only */
 
+    --hair:rgba(255,245,233,.16);
+    --hair-soft:rgba(255,245,233,.08);
+
+    /* Colour Usage (p8) sanctions only Electric Lime or Beige Linen on Black.
+       Body copy is therefore warm Beige Linen at reduced alpha, not plain
+       white — a small shift that keeps every pairing inside the guide. */
+    --text:rgba(255,245,233,.84);
     --bright:#FFF5E9;
-
-    /* ---- derived tints ---------------------------------------------------
-       NEEDS BRAND SIGN-OFF. The deck publishes solid swatches and documents no
-       opacity or tint scale, so any translucency is a derivation rather than
-       something the guide authorises. Every step below is a brand colour at a
-       stated alpha — no new hue is introduced anywhere — but the ladder itself
-       is ours. It replaces what had grown into 21 one-off rgba() recipes, so
-       the brand team has eleven values to approve instead of twenty-one.
-
-       Colour Usage (p8) sanctions only Electric Lime or Beige Linen on Black,
-       which is why the greys are tinted Beige Linen rather than plain white. */
-    --text:rgba(255,245,233,.84);       /* body copy                    */
-    --meta:rgba(255,245,233,.66);       /* secondary metadata           */
-    --edge:rgba(255,245,233,.32);       /* interactive borders          */
-    --edge-soft:rgba(255,245,233,.20);  /* dividers, decorative marks   */
-    --hair:rgba(255,245,233,.16);       /* section rules                */
-    --hair-soft:rgba(255,245,233,.08);  /* faint rules                  */
-    --veil:rgba(255,245,233,.05);       /* placeholder grounds          */
-    --edge-ink:rgba(20,20,20,.24);      /* dividers on Electric Lime    */
-    --ink-veil:rgba(20,20,20,.80);      /* body copy on Beige Linen     */
-    --surface:rgba(20,20,20,.96);       /* dock, drawer, sticky nav     */
-    --surface-fade:rgba(20,20,20,.62);  /* nav fade-out and page scrim  */
+    --meta:rgba(255,245,233,.66);
 
     --maxw:1320px;
     --pad:clamp(20px,4vw,60px);
-    --section-space:clamp(44px,5.5vw,80px);
-    --subsection-space:clamp(40px,5vw,64px);
 
     /* p10 primary (display), p11 secondary (UI and body). */
     --display:'League Spartan','Open Sauce Sans',system-ui,-apple-system,sans-serif;
@@ -567,7 +568,7 @@
   /* ---- nav ---- */
   .nav{position:sticky;top:0;z-index:35;display:flex;align-items:center;
     justify-content:space-between;gap:20px;padding:14px var(--pad);
-    background:linear-gradient(180deg,var(--surface),var(--surface-fade));
+    background:linear-gradient(180deg,rgba(20,20,20,.94),rgba(20,20,20,.6));
     backdrop-filter:blur(10px);border-bottom:1px solid var(--hair-soft);font-family:var(--ui);}
   .brand{display:flex;align-items:center;gap:9px;text-decoration:none;font-weight:700;
     font-size:15px;letter-spacing:.02em;text-transform:uppercase;color:var(--bright);
@@ -575,16 +576,11 @@
   .brand img{width:24px;height:24px;object-fit:contain;}
   .nav-list{display:flex;align-items:center;gap:clamp(14px,1.9vw,28px);
     list-style:none;margin:0;padding:0;}
-  /* :not(.btn) matters. The drawer's ticket CTA is an <a> inside .nav-list, so
-     this rule outranked .btn-solid on specificity and painted the button's
-     label in the muted nav colour — Beige Linen at 66% on Electric Lime, which
-     measures 1.01:1. The CTA was effectively invisible in the mobile drawer. */
-  .nav-list a:not(.btn){display:inline-flex;align-items:center;
-    min-width:44px;min-height:44px;text-decoration:none;
+  .nav-list a{display:inline-flex;align-items:center;min-width:44px;min-height:44px;
+    text-decoration:none;
     font-size:15px;letter-spacing:.04em;text-transform:uppercase;
-    color:var(--meta);transition:color .2s ease;}
-  .nav-list a:not(.btn):hover,
-  .nav-list a:not(.btn)[aria-current="true"]{color:var(--lime);}
+    color:rgba(255,245,233,.66);transition:color .2s ease;}
+  .nav-list a:hover,.nav-list a[aria-current="true"]{color:var(--lime);}
   .nav-list .drawer-cta{display:none;}
 
   .nav-toggle{display:none;background:none;border:0;padding:0;cursor:pointer;
@@ -593,7 +589,7 @@
   .nav-toggle .x{display:none;}
   .nav[data-open="true"] .nav-toggle .bars{display:none;}
   .nav[data-open="true"] .nav-toggle .x{display:block;}
-  .scrim{position:fixed;inset:0;z-index:34;background:var(--surface-fade);
+  .scrim{position:fixed;inset:0;z-index:34;background:rgba(0,0,0,.62);
     opacity:0;pointer-events:none;transition:opacity .3s ease;}
 
   /* ---- buttons: one obvious primary ---- */
@@ -602,13 +598,10 @@
     font-family:var(--ui);font-weight:700;font-size:15px;letter-spacing:.02em;
     text-decoration:none;cursor:pointer;text-align:center;
     transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease;}
-  /* Black on Electric Lime — the first pairing on the Colour Usage page.
-     Hover keeps the Lime ground and swaps the label to Vivid Royal, which is
-     the OTHER foreground p8 sanctions on Lime (11.1:1). The previous hover
-     lightened the ground to #F1FF7A, a colour that appears nowhere in the deck. */
+  /* Black on Electric Lime — the first pairing on the Colour Usage page. */
   .btn-solid{background:var(--lime);color:var(--ink);}
-  .btn-solid:hover{transform:translateY(-2px);color:var(--royal);}
-  .btn-outline{background:transparent;color:var(--bright);border-color:var(--edge);}
+  .btn-solid:hover{transform:translateY(-2px);background:#F1FF7A;}
+  .btn-outline{background:transparent;color:var(--bright);border-color:rgba(255,245,233,.34);}
   .btn-outline:hover{border-color:var(--lime);color:var(--lime);}
   .btn svg{width:17px;height:17px;flex:0 0 auto;}
 
@@ -701,15 +694,7 @@
     gap:6px clamp(12px,1.6vw,22px);margin:clamp(20px,2.6vw,32px) 0 0;
     font-family:var(--ui);font-weight:700;font-size:clamp(15px,1.3vw,16px);
     letter-spacing:.08em;text-transform:uppercase;color:var(--lime);}
-  .facts-line i{font-style:normal;color:var(--edge);}
-  /* On a phone the three facts cannot sit on one line, and wrapping a
-     centred flex row stranded a separator at the end of each line —
-     "FRI 14 AUG 2026 ·" / "SUNTEC SINGAPORE ·" / "FREE ADMISSION". Below the
-     breakpoint they become a proper centred stack and the separators go. */
-  @media (max-width:600px){
-    .facts-line{flex-direction:column;align-items:center;gap:4px;}
-    .facts-line i{display:none;}
-  }
+  .facts-line i{font-style:normal;color:rgba(255,245,233,.28);}
 
   .hero-cta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;
     margin:clamp(22px,2.8vw,34px) 0 0;}
@@ -726,30 +711,26 @@
     color:var(--bright);}
   .count i{font-style:normal;font-family:var(--ui);font-size:15px;letter-spacing:.1em;
     text-transform:uppercase;color:var(--meta);}
-  .count .dot{color:var(--edge-soft);}
+  .count .dot{color:rgba(255,245,233,.24);}
   .count .msg{font-size:clamp(16px,1.7vw,20px);color:var(--lime);font-weight:700;}
 
   /* ---- kinetic strip: industries, so it earns its space ---- */
-  .ticker{margin-top:clamp(28px,4.2vw,54px);margin-bottom:var(--section-space);
-    border-block:1px solid var(--hair);
+  .ticker{margin-top:clamp(28px,4.2vw,54px);border-block:1px solid var(--hair);
     padding-block:clamp(11px,1.4vw,17px);}
   .ticker .marquee-set{display:flex;align-items:center;}
   .ticker span{flex:0 0 auto;display:flex;align-items:center;gap:clamp(18px,2.6vw,38px);
-    margin-inline-end:clamp(18px,2.6vw,38px);font-family:var(--display);font-weight:400;
+    margin-inline-end:clamp(18px,2.6vw,38px);font-family:var(--display);font-weight:500;
     font-size:clamp(16px,1.6vw,21px);letter-spacing:-.01em;color:var(--bright);}
   .ticker span::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--lime);}
   /* Hidden on mobile: it competed with the countdown and clipped mid-word. */
-  @media (max-width:760px){
-    .ticker{display:none;}
-    .substrip{margin-bottom:var(--section-space);}
-  }
+  @media (max-width:760px){ .ticker{display:none;} }
 
   /* ---- sections ---- */
   section{scroll-margin-top:84px;}
   /* Two adjacent sections each contribute their padding to the same gap, so the
      figure here is half of what reads as the space between them. 116 made 232. */
-  .sec{padding-block:var(--section-space);}
-  .sec:not(#about){border-top:1px solid var(--hair);}
+  .sec{padding-block:clamp(44px,5.5vw,80px);}
+  .sec + .sec{border-top:1px solid var(--hair);}
   .eyebrow{display:flex;align-items:center;gap:14px;margin:0 0 clamp(16px,2.2vw,26px);
     font-family:var(--ui);font-weight:700;font-size:15px;letter-spacing:.14em;
     text-transform:uppercase;color:var(--meta);}
@@ -772,7 +753,7 @@
   /* ---- editorial photograph ---- */
   .plate{margin:0;}
   .plate img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;
-    background:var(--veil);}
+    background:rgba(255,245,233,.05);}
   /* Across the full column a 3:2 frame is 800px tall and fills with ceiling.
      Letterboxed and weighted low, the crop holds the crowd instead. */
   .plate.wide img{aspect-ratio:2.4/1;object-position:50% 64%;}
@@ -797,7 +778,6 @@
      ran together — "Offering exclusive opportunitiesSee every partner". */
   .fig span{display:block;font-size:clamp(15px,1.5vw,17px);line-height:1.55;}
   .fig-lnk{margin-top:10px;}
-  .stats{margin-top:var(--subsection-space);}
 
   /* ---- what you can do ---- */
   /* The step is measured at runtime (see _fitPills) rather than guessed, so the
@@ -810,21 +790,17 @@
        wraps instead of breaking out of the column. */
     max-width:calc(100% - var(--i) * var(--step));
     padding:clamp(12px,1.5vw,20px) clamp(24px,2.6vw,40px);
-    border:1px solid var(--edge);border-radius:999px;
-    background:var(--veil);font-family:var(--display);
+    border:1px solid rgba(255,245,233,.28);border-radius:999px;
+    background:rgba(255,245,233,.025);font-family:var(--display);
     font-size:clamp(16px,2vw,27px);letter-spacing:-.01em;color:var(--bright);
     transition:background .22s ease,color .22s ease,border-color .22s ease;}
   .pill i{flex:0 0 auto;font-style:normal;font-family:var(--ui);font-weight:700;
     font-size:15px;letter-spacing:.06em;color:var(--lime);
     padding-right:clamp(13px,1.3vw,17px);margin-right:clamp(13px,1.3vw,17px);
-    border-right:1px solid var(--edge-soft);
+    border-right:1px solid rgba(255,245,233,.2);
     transition:color .22s ease,border-color .22s ease;}
   .pill:hover{background:var(--lime);color:var(--ink);border-color:var(--lime);}
-  /* The numeral was 55%-opacity Black on Lime — an unlisted ~#747E2B at 3.96:1,
-     under the 4.5:1 that 15px text needs. Vivid Royal is the second sanctioned
-     foreground on Lime, clears 11.1:1, and still reads as subordinate to the
-     Black label because it is a different hue rather than a weaker one. */
-  .pill:hover i{color:var(--royal);border-right-color:var(--edge-ink);}
+  .pill:hover i{color:rgba(20,20,20,.55);border-right-color:rgba(20,20,20,.24);}
   :host(.reveal-on) .pill.is-in{animation-delay:calc(var(--i) * 70ms);}
   @media (max-width:760px){
     .pills{--step:0px;align-items:stretch;}
@@ -838,6 +814,46 @@
   @media (min-width:900px){
     .doing{display:flex;flex-direction:column;gap:clamp(32px,4vw,56px);}
     .doing .pills{margin-top:0 !important;}
+  }
+
+  /* ---- guest of honour ---- */
+  .goh-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);
+    gap:clamp(28px,6vw,92px);align-items:start;}
+  .goh-copy .role{margin:clamp(14px,2vw,22px) 0 0;font-family:var(--display);
+    font-size:clamp(18px,2vw,26px);line-height:1.12;color:var(--lime);}
+  .goh-copy .body{margin-top:clamp(24px,3vw,42px);}
+  .goh-facts{margin:clamp(24px,3vw,40px) 0 0;font-family:var(--ui);font-weight:700;
+    font-size:15px;line-height:1.65;letter-spacing:.08em;text-transform:uppercase;color:var(--lime);}
+  .goh-visual{margin:0;position:relative;background:var(--ink);}
+  .goh-visual img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;}
+  .goh-visual figcaption{margin-top:12px;font-family:var(--ui);font-size:15px;
+    line-height:1.5;color:var(--meta);}
+
+  /* ---- event flow ---- */
+  .flow-intro{max-width:42ch;margin:clamp(18px,2.4vw,30px) 0 clamp(28px,4vw,30px);
+    font-size:clamp(17px,1.8vw,21px);line-height:1.55;color:var(--text);}
+  .flow-label{display:grid;grid-template-columns:minmax(110px,1.2fr) minmax(0,2fr) minmax(0,4fr);
+    gap:clamp(16px,3vw,48px);padding-bottom:12px;font-family:var(--ui);font-weight:700;
+    font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--meta);}
+  .flow-list{border-top:1px solid var(--hair);}
+  .flow-row{display:grid;grid-template-columns:minmax(110px,1.2fr) minmax(0,2fr) minmax(0,4fr);
+    gap:clamp(16px,3vw,48px);padding-block:clamp(20px,2.6vw,32px);
+    border-bottom:1px solid var(--hair);}
+  .flow-time{font-family:var(--display);font-size:clamp(18px,2vw,26px);color:var(--lime);}
+  .flow-title{font-family:var(--display);font-size:clamp(18px,2vw,26px);line-height:1.08;
+    color:var(--bright);}
+  .flow-body{font-size:clamp(16px,1.5vw,18px);line-height:1.55;color:var(--text);}
+  @media (max-width:899px){
+    .goh-grid{grid-template-columns:1fr;}
+    .goh-visual{max-width:620px;}
+    .flow-label,.flow-row{grid-template-columns:minmax(92px,1fr) minmax(0,2fr);}
+    .flow-label span:nth-child(2){grid-column:2;}
+    .flow-body{grid-column:2;}
+  }
+  @media (max-width:520px){
+    .flow-label,.flow-row{grid-template-columns:1fr;gap:8px;}
+    .flow-label span:nth-child(2){grid-column:auto;}
+    .flow-body{grid-column:auto;}
   }
 
   /* ---- immersive gallery ---- */
@@ -856,16 +872,16 @@
   .shot{flex:0 0 auto;margin:0 clamp(10px,1.2vw,16px) 0 0;}
   .shot .frame{position:relative;overflow:hidden;
     height:clamp(230px,32vw,470px);
-    background:var(--veil);
+    background:rgba(255,245,233,.05);
     display:grid;place-items:center;}
   .shot.sm .frame{width:clamp(220px,34vw,350px);}
   .shot.lg .frame{width:clamp(290px,58vw,600px);}
   .shot img{width:100%;height:100%;object-fit:cover;display:block;}
   .shot .num{position:absolute;top:14px;left:16px;z-index:1;
     font-family:var(--ui);font-weight:700;font-size:15px;letter-spacing:.1em;
-    color:var(--lime);text-shadow:0 1px 10px var(--surface);}
+    color:var(--lime);text-shadow:0 1px 10px rgba(20,20,20,.85);}
   .shot .ph{font-family:var(--ui);font-size:15px;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--meta);}
+    text-transform:uppercase;color:rgba(255,245,233,.3);}
   .shot figcaption{margin:12px 2px 0;font-family:var(--ui);font-size:15px;
     line-height:1.45;color:var(--meta);max-width:34ch;}
 
@@ -873,12 +889,12 @@
   .band{margin-top:clamp(24px,3vw,40px);padding-block:clamp(32px,4vw,54px);
     background:var(--cream);overflow:hidden;}
   .band-intro{margin:0 0 clamp(20px,2.6vw,32px);max-width:48ch;
-    font-size:clamp(16px,1.6vw,18px);line-height:1.62;color:var(--ink-veil);}
+    font-size:clamp(16px,1.6vw,18px);line-height:1.62;color:rgba(20,20,20,.8);}
   .sectors{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 clamp(26px,3.4vw,42px);
     padding:0;list-style:none;}
   /* Vivid Royal on Beige Linen — the last pairing on the Colour Usage page. */
-  .sectors li{padding:8px 16px;border:1px solid var(--royal);border-radius:999px;
-    font-family:var(--ui);font-weight:400;font-size:15px;letter-spacing:.01em;
+  .sectors li{padding:8px 16px;border:1px solid rgba(34,22,180,.28);border-radius:999px;
+    font-family:var(--ui);font-weight:500;font-size:15px;letter-spacing:.01em;
     color:var(--royal);}
   .glabel{margin:0 0 clamp(14px,1.8vw,20px);font-family:var(--ui);font-weight:700;
     font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--royal);}
@@ -898,7 +914,7 @@
     transition:transform .25s ease;}
   .logo:hover img{transform:scale(1.06);}
   .logo .nm{display:grid;place-items:center;height:56px;max-width:230px;text-align:center;
-    font-family:var(--ui);font-weight:400;font-size:15px;color:var(--ink);}
+    font-family:var(--ui);font-weight:500;font-size:15px;color:var(--ink);}
   .logo.gold img{max-width:380px;}
 
   /* ---- partner profiles + faqs share one accordion ---- */
@@ -916,11 +932,13 @@
   .faq-a>div{overflow:hidden;}
   .faq-a p{margin:0 0 clamp(20px,2.6vw,30px);max-width:66ch;
     font-size:clamp(16px,1.6vw,18px);line-height:1.72;}
+  .faq-a h4{margin:0 0 6px;max-width:66ch;font-family:var(--ui);font-size:15px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--lime);}
   /* The tier a profile belongs to, so the accordion still carries the ranking
      once the logo band has scrolled off. */
   .faq .rank{display:block;margin-bottom:6px;font-family:var(--ui);font-weight:700;
     font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--meta);}
-  .sub-h{margin:var(--subsection-space) 0 clamp(18px,2.4vw,28px);font-family:var(--display);
+  .sub-h{margin:clamp(40px,5vw,72px) 0 clamp(18px,2.4vw,28px);font-family:var(--display);
     font-weight:700;font-size:clamp(24px,3vw,40px);line-height:1;letter-spacing:-.01em;
     color:var(--bright);}
 
@@ -933,7 +951,7 @@
     color:var(--lime);margin-bottom:clamp(12px,1.4vw,18px);}
 
   /* ---- closing pitch ---- */
-  .close{text-align:center;padding-block:var(--section-space);
+  .close{text-align:center;padding-block:clamp(60px,9vw,130px);
     border-top:1px solid var(--hair);}
   .close h2{max-width:20ch;margin-inline:auto;}
   .close > p{margin:clamp(20px,2.6vw,30px) auto 0;max-width:50ch;
@@ -945,14 +963,14 @@
 
   /* ---- footer ---- */
   .foot{border-top:1px solid var(--hair);
-    padding:var(--section-space) 0 clamp(88px,11vw,120px);}
+    padding:clamp(36px,5vw,70px) 0 clamp(88px,11vw,120px);}
   .presented{display:flex;flex-wrap:wrap;gap:clamp(26px,5vw,74px);align-items:center;
     padding-bottom:clamp(28px,3.6vw,46px);border-bottom:1px solid var(--hair);}
   .presented div{display:flex;align-items:center;gap:16px;}
   .presented small{font-family:var(--ui);font-size:15px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--meta);}
   .presented img{height:52px;width:auto;object-fit:contain;}
-  .foot-tagline{margin:0 0 0 auto;font-family:var(--display);font-weight:400;
+  .foot-tagline{margin:0 0 0 auto;font-family:var(--display);font-weight:500;
     font-size:clamp(18px,2vw,26px);letter-spacing:-.01em;color:var(--lime);}
   .foot-cols{display:grid;gap:clamp(24px,3.6vw,50px);margin-top:clamp(28px,3.6vw,46px);
     grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
@@ -964,12 +982,12 @@
     font-size:16px;color:var(--text);text-decoration:none;transition:color .2s ease;}
   .foot li a:hover{color:var(--lime);}
   .copy{margin:clamp(28px,3.6vw,46px) 0 0;font-family:var(--ui);font-size:15px;
-    letter-spacing:.02em;color:var(--meta);}
+    letter-spacing:.02em;color:rgba(255,245,233,.66);}
 
   /* ---- sticky dock ---- */
   .dock{position:fixed;left:0;right:0;bottom:0;z-index:38;transform:translateY(110%);
     display:flex;align-items:center;justify-content:space-between;gap:14px;
-    padding:11px var(--pad);background:var(--surface);
+    padding:11px var(--pad);background:rgba(20,20,20,.96);
     border-top:1px solid var(--hair);backdrop-filter:blur(12px);
     transition:transform .38s cubic-bezier(.2,.8,.2,1);font-family:var(--ui);}
   .dock.is-up{transform:none;}
@@ -1001,16 +1019,15 @@
        the page and leaves a block of empty black behind it. */
     .nav-list{position:fixed;top:0;right:0;bottom:0;width:min(86vw,360px);
       z-index:36;flex-direction:column;align-items:stretch;justify-content:center;
-      gap:4px;padding:84px 28px 40px;background:var(--surface);
+      gap:4px;padding:84px 28px 40px;background:rgba(20,20,20,.985);
       border-left:1px solid var(--hair);overflow-y:auto;
       transform:translateX(101%);transition:transform .32s cubic-bezier(.2,.8,.2,1);}
     .nav[data-open="true"] .nav-list{transform:none;}
     .nav[data-open="true"] ~ .scrim,
     .nav[data-open="true"] + .scrim{opacity:1;pointer-events:auto;}
-    /* Full-width rows in the drawer: a bigger tap target and a cleaner list.
-       Excludes the CTA, which is a button and keeps its own box. */
-    .nav-list a:not(.btn){display:flex;min-height:54px;font-size:17px;
-      letter-spacing:.02em;border-bottom:1px solid var(--hair-soft);}
+    /* Full-width rows in the drawer: a bigger tap target and a cleaner list. */
+    .nav-list a{display:flex;min-height:54px;font-size:17px;letter-spacing:.02em;
+      border-bottom:1px solid var(--hair-soft);}
     .nav-list .drawer-cta{display:block;margin-top:24px;}
     .nav-list .drawer-cta .btn{width:100%;}
     .fig{grid-template-columns:minmax(0,1fr);}
@@ -1020,7 +1037,6 @@
     *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important;}
     .rise{opacity:1 !important;}
   }
-  
   `;
 
   /* Take a duplicated track out of the accessibility tree AND the tab order.
@@ -1196,6 +1212,8 @@
     const navItems = [
       ['About', '#about'],
       ['Why visit', '#why'],
+      ['GOH', '#goh'],
+      ['Event flow', '#flow'],
       ['Partners', '#partners'],
       ['Legacy', '#legacy'],
       ['Getting there', '#getting-there'],
@@ -1233,6 +1251,13 @@
         '<i>' + String(i + 1).padStart(2, '0') + '</i><span>' + esc(d) + '</span>' +
       '</div>').join('');
 
+    const flowRows = EVENT_FLOW.map((item) =>
+      '<div class="flow-row rise">' +
+        '<div class="flow-time">' + esc(item.time) + '</div>' +
+        '<div class="flow-title">' + esc(item.title) + '</div>' +
+        '<div class="flow-body">' + esc(item.body) + '</div>' +
+      '</div>').join('');
+
     const shots = GALLERY.map((g, i) =>
       '<figure class="shot ' + g.size + '">' +
         '<div class="frame">' +
@@ -1252,14 +1277,28 @@
         'aria-controls="' + idPrefix + i + '"><span>' +
           (r.rank ? '<span class="rank">' + esc(r.rank) + '</span>' : '') + esc(r.head) +
         '</span>' + CHEV + '</button></h3>' +
-        '<div class="faq-a" id="' + idPrefix + i + '" role="region"><div><p>' +
-          esc(r.body) + '</p></div></div>' +
+        '<div class="faq-a" id="' + idPrefix + i + '" role="region"><div>' +
+          (r.bodyHtml || '<p>' + esc(r.body) + '</p>') + '</div></div>' +
       '</div>').join('');
 
     const profiles = accordion(
-      PROFILES.map((p) => ({ head: p.name, rank: p.tier, body: p.body })), 'p');
+      PROFILES.map((p) => ({
+        head: p.name,
+        rank: p.tier,
+        body: p.body,
+        bodyHtml: p.paragraphs
+          ? p.paragraphs.map((paragraph) => '<p>' + esc(paragraph) + '</p>').join('')
+          : null,
+      })), 'p');
     const faqs = accordion(
-      FAQS.map((f) => ({ head: f.q, body: f.a })), 'a');
+      FAQS.map((f) => ({
+        head: f.q,
+        body: f.a,
+        bodyHtml: f.answers
+          ? f.answers.map((answer) => '<h4>' + esc(answer.head) + '</h4><p>' +
+              esc(answer.body) + '</p>').join('')
+          : null,
+      })), 'a');
 
     const legacy = LEGACY.map((l) =>
       '<div class="legacy-item rise"><h2>' + esc(l.head) + '</h2>' +
@@ -1296,7 +1335,7 @@
           // AND tagline, which p3 sets as one object. Nothing else may go inside.
           '<div class="mark"><div class="mark-clear">' +
             '<div class="lockup">' +
-              '<img src="' + esc(CONFIG.heroImage) + '" alt="BlastOFF! 2026" ' +
+              '<img src="' + esc(CONFIG.heroImage) + '" alt="BlastOff! 2026" ' +
                 'width="1368" height="300" fetchpriority="high">' +
               '<p class="tagline">' + esc(EVENT.tagline) + '</p>' +
             '</div>' +
@@ -1314,8 +1353,8 @@
            they made nine stacked elements and pushed the CTA away from being
            the last thing read. */
         '<div class="wrap substrip">' +
-          '<div class="count" id="count" aria-label="Time until BlastOFF! 2026"></div>' +
-          '<p class="micro">400+ attendees · 20+ corporate partners · ' +
+          '<div class="count" id="count" aria-label="Time until BlastOff! 2026"></div>' +
+          '<p class="micro">400+ attendees · 20+ partners · ' +
             '40+ partner societies</p>' +
         '</div>' +
 
@@ -1340,7 +1379,7 @@
             '</div>' +
             '<figure class="plate wide rise" style="margin-top:clamp(36px,5vw,72px)">' +
               photo('fair-floor',
-                'A crowded exhibition hall of students moving between employer booths at BlastOFF!',
+                'A crowded exhibition hall of students moving between employer booths at BlastOff!',
                 '(max-width:900px) 92vw, 1320px') +
               '<figcaption>Hundreds of students, dozens of organisations, one afternoon.</figcaption>' +
             '</figure>' +
@@ -1349,17 +1388,48 @@
           '<section class="sec" id="why">' +
             '<div class="doing">' +
               '<div>' + eyebrow('02', 'Why visit') +
-                '<h2 style="max-width:18ch">What you can do at <em>BlastOFF!</em></h2></div>' +
+                '<h2 style="max-width:18ch">What you can do at <em>BlastOff!</em></h2></div>' +
               '<div class="pills" style="margin-top:clamp(34px,4.6vw,64px)">' + doings + '</div>' +
             '</div>' +
             '<div style="margin-top:clamp(56px,8vw,104px)">' + figs + '</div>' +
+          '</section>' +
+
+          '<section class="sec" id="goh">' +
+            eyebrow('03', 'Guest-of-Honour') +
+            '<div class="goh-grid">' +
+              '<div class="goh-copy">' +
+                '<h2>Meet our<br><em>Guest-of-Honour</em></h2>' +
+                '<p class="lede rise">' + esc(GOH.intro) + '</p>' +
+                '<p class="role">' + esc(GOH.role) + '</p>' +
+                '<div class="body rise">' +
+                  GOH.paragraphs.map((p) => '<p>' + esc(p) + '</p>').join('') +
+                  '<p>We look forward to his sharing at BlastOff! 2026!</p>' +
+                '</div>' +
+                '<p class="goh-facts">' + esc(EVENT.dateLabel) + ' · ' + esc(EVENT.timeLabel) +
+                  ' · ' + esc(EVENT.venueShort) + ' · ' + esc(EVENT.venueDetail) + '</p>' +
+                '<p style="margin-top:24px">' + ticketBtn('btn-solid') + '</p>' +
+              '</div>' +
+              '<figure class="goh-visual rise">' +
+                '<img src="' + esc(CONFIG.gohImage) + '" alt="' + esc(GOH.name + ', ' + GOH.role) + '"' +
+                  ' width="1024" height="1280" loading="lazy" decoding="async">' +
+                '<figcaption>Guest-of-Honour · BlastOff! 2026</figcaption>' +
+              '</figure>' +
+            '</div>' +
+          '</section>' +
+
+          '<section class="sec" id="flow">' +
+            eyebrow('04', 'Event flow') +
+            '<h2>Programme<br><em>Schedule</em></h2>' +
+            '<p class="flow-intro rise">A loose guide to the afternoon — come early, stay curious and leave with new connections.</p>' +
+            '<div class="flow-label"><span>Time (SGT)</span><span>Programme Item</span></div>' +
+            '<div class="flow-list">' + flowRows + '</div>' +
           '</section>' +
         '</div>' +
 
         '<section class="sec" aria-labelledby="gal-h">' +
           '<div class="wrap rail-head">' +
-            '<div>' + eyebrow('03', 'Gallery') +
-              '<h2 id="gal-h">See what<br>BlastOFF! <em>is like</em></h2>' +
+            '<div>' + eyebrow('05', 'Gallery') +
+              '<h2 id="gal-h">See what<br>BlastOff! <em>is like</em></h2>' +
               '<p class="lede rise" style="max-width:40ch;font-size:clamp(17px,1.7vw,20px)">' +
                 'Hundreds of students, dozens of organisations, and one afternoon of ' +
                 'conversations that could shape what comes next.</p></div>' +
@@ -1378,12 +1448,12 @@
         '</section>' +
 
         '<section class="sec" id="partners">' +
-          '<div class="wrap">' + eyebrow('04', 'Partners') +
+          '<div class="wrap">' + eyebrow('06', 'Partners') +
             '<h2>Meet the organisations<br><em>looking for talent like you</em></h2></div>' +
           '<div class="band">' +
             '<div class="wrap">' +
-              '<p class="band-intro">More than twenty corporate partners across finance, ' +
-                'consulting, technology, energy and Singapore’s public service.</p>' +
+              '<p class="band-intro">More than twenty participating organisations across ' +
+                'finance, consulting, technology, energy and Singapore’s public service.</p>' +
               '<ul class="sectors">' + sectors + '</ul>' +
             '</div>' +
             tiers +
@@ -1396,24 +1466,24 @@
 
         '<div class="wrap">' +
           '<section class="sec" id="legacy" aria-label="Legacy">' +
-            eyebrow('05', 'Legacy') +
+            eyebrow('07', 'Legacy') +
             '<div class="split">' +
               '<div>' + legacy + '</div>' +
               '<figure class="plate tall rise">' +
                 photo('legacy-banner',
-                  'A roll-up banner carrying the UKSSC crest and the BlastOFF! logo used at an earlier edition',
+                  'A roll-up banner carrying the UKSSC crest and the BlastOff! logo used at an earlier edition',
                   '(max-width:900px) 92vw, 560px') +
-                '<figcaption>BlastOFF! from an earlier edition</figcaption>' +
+                '<figcaption>From the 2025 edition of BlastOff!</figcaption>' +
               '</figure>' +
             '</div>' +
           '</section>' +
 
           '<section class="sec" id="getting-there">' +
-            eyebrow('06', 'Getting there') +
+            eyebrow('08', 'Getting there') +
             '<div class="split">' +
               '<div>' +
                 '<h2 style="font-size:clamp(28px,4.2vw,54px);color:var(--lime)">' +
-                  'Suntec Singapore</h2>' +
+                  'Suntec Convention Centre</h2>' +
                 '<div class="body" style="margin-top:20px">' +
                   '<p>Convention &amp; Exhibition Centre<br>' + esc(EVENT.venueDetail) +
                   '<br>1 Raffles Boulevard</p>' +
@@ -1429,7 +1499,7 @@
           '</section>' +
 
           '<section class="sec" id="faqs">' +
-            eyebrow('07', 'Questions') +
+            eyebrow('09', 'Questions') +
             '<h2 style="margin-bottom:clamp(26px,3.4vw,46px)">FAQs</h2>' + faqs +
           '</section>' +
 
@@ -1450,9 +1520,9 @@
         '</div>' +
       '</main>' +
 
-      // SGN is not repeated here: Company Details lists it as the Bronze
-      // partner, so it belongs in the tier band and nowhere else.
       '<footer class="foot wrap" id="contact">' +
+        // SGN is not repeated here: it belongs in the community partner tier
+        // and nowhere else.
         '<div class="presented">' +
           '<div><small>proudly presented by</small>' +
             '<img src="' + esc(CONFIG.crestImage) + '" alt="UKSSC"></div>' +
@@ -1484,12 +1554,13 @@
               esc(CONFIG.contactEmail) + '</a></li>' +
           '</ul></div>' +
         '</div>' +
-        '<p class="copy">© 2026 United Kingdom Singapore Student Council</p>' +
+        '<p class="copy">© 2026 United Kingdom Singapore Student Council · Draft, not the live page</p>' +
       '</footer>' +
     '</div>' +
 
     '<div class="dock" id="dock">' +
-      '<p><b>' + esc(EVENT.dateLabel) + '</b> · ' + esc(EVENT.timeLabel) + ' · Suntec · free</p>' +
+      '<p><b>' + esc(EVENT.dateLabel) + '</b> · ' + esc(EVENT.timeLabel) + ' · ' +
+        esc(EVENT.venueShort) + ' · free</p>' +
       '<span class="grp">' +
         '<button class="top" id="to-top" type="button" aria-label="Back to top">↑</button>' +
         ticketBtn('btn-solid') +
@@ -1609,7 +1680,7 @@
           if (active) active.setAttribute('aria-current', 'true');
         });
       }, { rootMargin: '-45% 0px -50% 0px' });
-      ['about', 'why', 'partners', 'legacy', 'getting-there', 'faqs'].forEach((id) => {
+      ['about', 'why', 'goh', 'flow', 'partners', 'legacy', 'getting-there', 'faqs'].forEach((id) => {
         const el = root.getElementById(id);
         if (el) io.observe(el);
       });
@@ -1754,7 +1825,7 @@
           return;
         }
         if (now >= start) {
-          list.innerHTML = '<span class="msg">Happening now — Suntec, Level 3 Summit 1</span>';
+          list.innerHTML = '<span class="msg">Happening now — Suntec Convention Centre, Level 3 Summit 1</span>';
           return;
         }
         let left = start - now;
@@ -1805,7 +1876,7 @@
         const data = {
           title: EVENT.name,
           text: EVENT.proposition + ' — ' + EVENT.dateLabel + ', ' + EVENT.timeLabel +
-                ' at Suntec. Free admission.',
+                ' at Suntec Convention Centre. Free admission.',
           url: CONFIG.pageUrl,
         };
         if (navigator.share) {
