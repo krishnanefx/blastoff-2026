@@ -1504,7 +1504,7 @@
               esc(CONFIG.contactEmail) + '</a></li>' +
           '</ul></div>' +
         '</div>' +
-        '<p class="copy">© 2026 United Kingdom Singapore Student Council · Draft, not the live page</p>' +
+        '<p class="copy">© 2026 United Kingdom Singapore Student Council</p>' +
       '</footer>' +
     '</div>' +
 
