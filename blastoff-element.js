@@ -353,6 +353,10 @@
       body: 'At the Ministry of Transport (MOT), we spearhead developments in our air, land and sea transport sectors to advance Singapore’s economic competitiveness and Singaporeans’ quality of life. We seek dynamic, analytical and committed individuals to join our able MOT team in realising our vision of a global interconnected transport hub.',
     },
     {
+      name: 'Singapore Civil Defence Force (SCDF)', tier: 'Government partner',
+      body: 'The Singapore Civil Defence Force (SCDF) protects and saves lives through firefighting, rescue, emergency medical services, hazardous materials response and fire safety regulation. Evolving from Singapore’s civil defence efforts, SCDF continues to strengthen emergency preparedness through innovation, community engagement and a professional, well-trained force ready to respond to crises.',
+    },
+    {
       name: 'Immigration & Checkpoints Authority (ICA)', tier: 'Government partner',
       body: 'Immigration & Checkpoints Authority (ICA) is the Guardian of Singapore’s borders, with a mission to secure our borders and uphold Singapore laws on immigration and national registration. We are Singapore’s frontline, keeping Singapore connected to the world, while protecting our communities by keeping dangerous and illegal items off our shores.',
     },
