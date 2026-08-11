@@ -29,7 +29,16 @@
   <meta property="og:image:alt" content="BlastOff! 2026 — to new horizons! Friday 14 August 2026, 4pm–9pm, Suntec Convention Centre.">
   <meta name="twitter:card" content="summary_large_image">
 
-  <link rel="icon" href="./assets/ukssc-crest.png">
+  <!-- Google was showing the generic globe because the crest is 273x253 and it
+       only accepts a SQUARE favicon, and because /favicon.ico was missing — the
+       location it falls back to. Both fixed; sizes are multiples of 48 as Google
+       asks. Rebuild with tools/make-favicons.py. Keep these URLs stable: Google
+       recrawls favicons on its own schedule and a moved file resets the clock. -->
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" type="image/png" sizes="48x48" href="./assets/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="./assets/favicon-96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/favicon-192.png">
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="./assets/fonts/open-sauce-sans-700.woff2" as="font" type="font/woff2" crossorigin>
