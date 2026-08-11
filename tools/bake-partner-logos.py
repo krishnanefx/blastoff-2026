@@ -46,6 +46,10 @@ JOBS = [
     # Black wordmark, not the white one: the band is cream.
     ('jpmorgan',   'Company Logos/JPMC_Logo_Standard_Black_RGB.png', False),
     ('mfa',        'Company Logos/MFA Logo.png', False),
+    # The horizontal lockup, finally supplied. The old mark was the vertical
+    # purple tile, which at equal ink area rendered as a small dark block on the
+    # cream band with the wordmark reversed out and barely legible.
+    ('htx',        'Company Logos/HTX/HTX_Horizontal Logo_Web_RGB_Full Colour.png', False),
     ('pwc',        'Company Logos/PwC/PwC_logo_rgb_colour_pos 2.png', False),
     # Flattened on white — knock the background out.
     ('bp',         'Company Logos/BPP_Rlbg.jpg', True),
