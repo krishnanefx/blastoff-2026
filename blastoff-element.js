@@ -46,6 +46,7 @@
   const CONFIG = {
     ticketsUrl: 'https://www.eventbrite.sg/e/blastoff-2026-to-new-horizons-tickets-1995329425023',
     heroImage: asset('./assets/blastoff-wordmark.png'),
+    gohImage: asset('./assets/jeffrey-siow-goh.jpg'),
     crestImage: asset('./assets/ukssc-crest.png'),
     logoBase: asset('./assets/logos/'),
     photoBase: asset('./assets/photos/'),
@@ -143,6 +144,16 @@
     { time: '6:00–9:00 pm', title: 'Career Fair Resumes', body: 'Meet participating organisations, explore pathways and connect with Singaporean talent.' },
     { time: '9:00 pm', title: 'End of Event', body: 'Thank you for joining BlastOff! 2026.' },
   ];
+
+  const GOH = {
+    name: 'Mr Jeffrey Siow',
+    role: 'Minister for Transport and Second Minister for Finance',
+    intro: 'We are honoured to welcome Mr Jeffrey Siow as our Guest-of-Honour for BlastOff! 2026.',
+    paragraphs: [
+      'Mr Siow oversees Singapore’s air, land and sea transport, and helps shape the country’s fiscal and economic strategy.',
+      'Before taking office, Mr Siow was Second Permanent Secretary at both the Ministry of Manpower and the Ministry of Trade and Industry, where he led national efforts to grow Singapore’s economy, and to develop a productive workforce and progressive workplaces to benefit Singaporeans.',
+    ],
+  };
 
   // Copywriting doc, ABOUT — the supplied paragraph, broken for reading.
   const ABOUT = [
@@ -809,6 +820,19 @@
     .doing .pills{margin-top:0 !important;}
   }
 
+  /* ---- guest of honour ---- */
+  .goh-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);
+    gap:clamp(28px,6vw,92px);align-items:start;}
+  .goh-copy .role{margin:clamp(14px,2vw,22px) 0 0;font-family:var(--display);
+    font-size:clamp(18px,2vw,26px);line-height:1.12;color:var(--lime);}
+  .goh-copy .body{margin-top:clamp(24px,3vw,42px);}
+  .goh-facts{margin:clamp(24px,3vw,40px) 0 0;font-family:var(--ui);font-weight:700;
+    font-size:15px;line-height:1.65;letter-spacing:.08em;text-transform:uppercase;color:var(--lime);}
+  .goh-visual{margin:0;position:relative;background:var(--ink);}
+  .goh-visual img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;}
+  .goh-visual figcaption{margin-top:12px;font-family:var(--ui);font-size:15px;
+    line-height:1.5;color:var(--meta);}
+
   /* ---- event flow ---- */
   .flow-intro{max-width:42ch;margin:clamp(18px,2.4vw,30px) 0 clamp(28px,4vw,30px);
     font-size:clamp(17px,1.8vw,21px);line-height:1.55;color:var(--text);}
@@ -824,6 +848,8 @@
     color:var(--bright);}
   .flow-body{font-size:clamp(16px,1.5vw,18px);line-height:1.55;color:var(--text);}
   @media (max-width:899px){
+    .goh-grid{grid-template-columns:1fr;}
+    .goh-visual{max-width:620px;}
     .flow-label,.flow-row{grid-template-columns:minmax(92px,1fr) minmax(0,2fr);}
     .flow-label span:nth-child(2){grid-column:2;}
     .flow-body{grid-column:2;}
@@ -1198,6 +1224,7 @@
     const navItems = [
       ['About', '#about'],
       ['Why visit', '#why'],
+      ['GOH', '#goh'],
       ['Event flow', '#flow'],
       ['Partners', '#partners'],
       ['Legacy', '#legacy'],
@@ -1379,8 +1406,31 @@
             '<div style="margin-top:clamp(56px,8vw,104px)">' + figs + '</div>' +
           '</section>' +
 
+          '<section class="sec" id="goh">' +
+            eyebrow('03', 'Guest-of-Honour') +
+            '<div class="goh-grid">' +
+              '<div class="goh-copy">' +
+                '<h2>Meet our<br><em>Guest-of-Honour</em></h2>' +
+                '<p class="lede rise">' + esc(GOH.intro) + '</p>' +
+                '<p class="role">' + esc(GOH.role) + '</p>' +
+                '<div class="body rise">' +
+                  GOH.paragraphs.map((p) => '<p>' + esc(p) + '</p>').join('') +
+                  '<p>We look forward to his sharing at BlastOff! 2026!</p>' +
+                '</div>' +
+                '<p class="goh-facts">' + esc(EVENT.dateLabel) + ' · ' + esc(EVENT.timeLabel) +
+                  ' · ' + esc(EVENT.venueShort) + ' · ' + esc(EVENT.venueDetail) + '</p>' +
+                '<p style="margin-top:24px">' + ticketBtn('btn-solid') + '</p>' +
+              '</div>' +
+              '<figure class="goh-visual rise">' +
+                '<img src="' + esc(CONFIG.gohImage) + '" alt="' + esc(GOH.name + ', ' + GOH.role) + '"' +
+                  ' width="1024" height="1280" loading="lazy" decoding="async">' +
+                '<figcaption>Guest-of-Honour · BlastOff! 2026</figcaption>' +
+              '</figure>' +
+            '</div>' +
+          '</section>' +
+
           '<section class="sec" id="flow">' +
-            eyebrow('03', 'Event flow') +
+            eyebrow('04', 'Event flow') +
             '<h2>Programme<br><em>Schedule</em></h2>' +
             '<p class="flow-intro rise">A loose guide to the afternoon — come early, stay curious and leave with new connections.</p>' +
             '<div class="flow-label"><span>Time (SGT)</span><span>Programme Item</span></div>' +
@@ -1390,7 +1440,7 @@
 
         '<section class="sec" aria-labelledby="gal-h">' +
           '<div class="wrap rail-head">' +
-            '<div>' + eyebrow('04', 'Gallery') +
+            '<div>' + eyebrow('05', 'Gallery') +
               '<h2 id="gal-h">See what<br>BlastOff! <em>is like</em></h2>' +
               '<p class="lede rise" style="max-width:40ch;font-size:clamp(17px,1.7vw,20px)">' +
                 'Hundreds of students, dozens of organisations, and one afternoon of ' +
@@ -1410,7 +1460,7 @@
         '</section>' +
 
         '<section class="sec" id="partners">' +
-          '<div class="wrap">' + eyebrow('05', 'Partners') +
+          '<div class="wrap">' + eyebrow('06', 'Partners') +
             '<h2>Meet the organisations<br><em>looking for talent like you</em></h2></div>' +
           '<div class="band">' +
             '<div class="wrap">' +
@@ -1428,7 +1478,7 @@
 
         '<div class="wrap">' +
           '<section class="sec" id="legacy" aria-label="Legacy">' +
-            eyebrow('06', 'Legacy') +
+            eyebrow('07', 'Legacy') +
             '<div class="split">' +
               '<div>' + legacy + '</div>' +
               '<figure class="plate tall rise">' +
@@ -1441,7 +1491,7 @@
           '</section>' +
 
           '<section class="sec" id="getting-there">' +
-            eyebrow('07', 'Getting there') +
+            eyebrow('08', 'Getting there') +
             '<div class="split">' +
               '<div>' +
                 '<h2 style="font-size:clamp(28px,4.2vw,54px);color:var(--lime)">' +
@@ -1461,7 +1511,7 @@
           '</section>' +
 
           '<section class="sec" id="faqs">' +
-            eyebrow('08', 'Questions') +
+            eyebrow('09', 'Questions') +
             '<h2 style="margin-bottom:clamp(26px,3.4vw,46px)">FAQs</h2>' + faqs +
           '</section>' +
 
@@ -1642,7 +1692,7 @@
           if (active) active.setAttribute('aria-current', 'true');
         });
       }, { rootMargin: '-45% 0px -50% 0px' });
-      ['about', 'why', 'flow', 'partners', 'legacy', 'getting-there', 'faqs'].forEach((id) => {
+      ['about', 'why', 'goh', 'flow', 'partners', 'legacy', 'getting-there', 'faqs'].forEach((id) => {
         const el = root.getElementById(id);
         if (el) io.observe(el);
       });
