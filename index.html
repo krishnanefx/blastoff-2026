@@ -6,11 +6,36 @@
        immediately, which is as early as its instructions ask for. -->
   <meta charset="utf-8">
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-745HXEWHXZ"></script>
+  <!-- Consent Mode v2, defaulting to denied.
+       Most visitors are Singaporean students in the UK and Ireland, so UK GDPR
+       and PECR apply: the _ga cookie is non-essential and needs consent BEFORE
+       it is set. With analytics_storage denied, GA4 still receives cookieless
+       pings — page views and traffic sources arrive, modelled rather than
+       measured, and nothing is written to the visitor's device.
+
+       This block must run BEFORE gtag.js loads, not merely before config().
+       Set afterwards, the library has already initialised under the default
+       granted state and may have written a cookie.
+
+       Adding a banner later means keeping this and calling, on accept:
+           gtag('consent', 'update', { analytics_storage: 'granted' });
+       and adding `wait_for_update: 500` below so hits pause for the answer.
+       There is no banner today, so no wait is configured — a wait with nothing
+       to wait for just delays every hit. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied'
+    });
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-745HXEWHXZ"></script>
+  <script>
     gtag('js', new Date());
 
     gtag('config', 'G-745HXEWHXZ');
