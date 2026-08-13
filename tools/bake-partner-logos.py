@@ -33,7 +33,11 @@ from scipy import ndimage
 OUT = 'assets/logos'
 SCRATCH = 'tools/logo-render'
 
-# slug -> (path from the repo root, needs background knockout)
+# slug -> (path from the repo root, background mode)
+#   False      leave alone, the file already has alpha
+#   True       edge flood fill: removes only white touching the border
+#   'unmatte'  un-premultiply from white: removes ALL white. Opt in only for
+#              artwork with no meaningful white — see unmatte() for why.
 # Where a partner supplied several versions, the note says why this one.
 JOBS = [
     # Already transparent PNGs — used as supplied.
@@ -57,7 +61,8 @@ JOBS = [
     ('lta',        'Company Logos/LTA/LTA Logo with Tagline (jpg file).jpg', True),
     # Rendered from the supplied vector PDFs (see render_pdf below).
     ('mas',        'Company Logos/MAS/Monetary Authority of Singapore.pdf', True),
-    ('mof',        'Company Logos/MOF/Color/4c-MOF logo-CMYK copy.pdf', True),
+    # 'unmatte', not True: the edge fill leaves a white disc inside the O.
+    ('mof',        'Company Logos/MOF/Color/4c-MOF logo-CMYK copy.pdf', 'unmatte'),
 ]
 
 LONG_EDGE = 1000      # plenty for a mark that renders at most ~380px wide
@@ -79,6 +84,39 @@ def render_pdf(path, out_png):
         raise RuntimeError(f'Quick Look could not rasterise {path}')
     os.replace(produced, out_png)
     return out_png
+
+
+def unmatte(im):
+    """Recover ink-over-white as ink-with-alpha, removing white EVERYWHERE.
+
+    Edge flood fill cannot reach white that ink encloses — MOF's "O" kept a
+    solid white disc in its counter, because the letter ring seals it off from
+    the border. Raising the fill's tolerance does not help; it just trades the
+    disc for a white halo along every antialiased edge.
+
+    So solve the compositing that produced the file instead. Each pixel is ink C
+    over white at coverage a:
+
+        observed = a*C + (1 - a)*255   ->   a = 1 - min(R,G,B)/255
+                                            C = (observed - 255*(1 - a)) / a
+
+    White becomes a=0, solid ink a=1, and a half-covered edge pixel comes back
+    as full-strength ink at 50% alpha — antialiasing intact, no halo. Taking
+    coverage from the MINIMUM channel preserves hue, so MOF's red "SINGAPORE"
+    survives rather than greying out.
+
+    OPT IN PER LOGO. This removes all white, so it would destroy HSBC's hexagon
+    segments, the LSE letters reversed out of red, the white rays at the centre
+    of bp's Helios, and MAS's reversed-out lettering. Only use it on artwork
+    with no meaningful white.
+    """
+    rgb = np.asarray(im.convert('RGB')).astype(np.float64)
+    alpha = 1.0 - rgb.min(axis=2) / 255.0
+    alpha[alpha < 0.03] = 0.0          # exports are often 253, not 255
+    safe = np.where(alpha > 0, alpha, 1.0)[:, :, None]
+    ink = np.clip((rgb - 255.0 * (1.0 - safe)) / safe, 0, 255)
+    out = np.dstack([ink, alpha * 255.0]).astype(np.uint8)
+    return Image.fromarray(out, 'RGBA')
 
 
 def knockout(im):
@@ -120,7 +158,7 @@ def main():
         sys.exit(f'{OUT}/ not found — run from the repo root')
     os.makedirs(SCRATCH, exist_ok=True)
 
-    for slug, rel, needs_knockout in JOBS:
+    for slug, rel, mode in JOBS:
         path = rel
         if not os.path.exists(path):
             print(f'  SKIP {slug:11s} missing: {rel}')
@@ -130,7 +168,12 @@ def main():
             path = render_pdf(path, os.path.join(SCRATCH, slug + '.png'))
 
         im = Image.open(path)
-        im = knockout(im) if needs_knockout else im.convert('RGBA')
+        if mode == 'unmatte':
+            im = unmatte(im)
+        elif mode:
+            im = knockout(im)
+        else:
+            im = im.convert('RGBA')
         im = trim(im)
 
         if max(im.size) > LONG_EDGE:
